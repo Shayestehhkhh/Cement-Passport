@@ -1,8 +1,8 @@
 Digital Cement Passport (DCP) – illustrative pilot implementation
 
-This repository accompanies the article *Digital Material Passports for the Construction Sector:
-Batch-Level Traceability of Energy and Carbon Data with Building Information Modeling*
-(Hamidkhaniha, Garcia Martinez, Pourhosseini; under review).
+This repository accompanies a manuscript on the Digital Cement Passport (DCP) framework by
+Hamidkhaniha, Garcia Martinez and Pourhosseini (Universidad de Sevilla), currently under review.
+The reference to the published article will be added here after publication.
 
 The article is conceptual: it specifies the DCP framework. This package is a small pilot that
 shows the specified data structure can be expressed in machine-readable form and checked automatically.
