@@ -1,7 +1,6 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cement Passport DCP-EX-2026-000123</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@500;600&family=Source+Sans+3:wght@400;600;700&display=swap">
 <style>
@@ -63,8 +62,9 @@ td.n,th.n{text-align:right}
 tr:last-child td{border-bottom:0}
 .bars{display:flex;flex-direction:column;gap:8px;padding:14px 0}
 .brow{display:grid;grid-template-columns:52px minmax(0,1fr) 64px;align-items:center;gap:10px;font-size:14px}
-.brow .t{height:16px;background:var(--bar3);border-radius:3px;overflow:hidden}
-.brow .t i{display:block;height:100%;background:var(--bar)}
+.brow .t{position:relative;height:16px;background:var(--bar3);border-radius:3px;overflow:hidden}
+.brow .t i{position:absolute;top:0;bottom:0;background:var(--bar)}
+.brow .t s{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--muted)}
 .brow .val{text-align:right;font-variant-numeric:tabular-nums}
 .brow b{font-family:var(--f-mono);font-weight:600}
 .qrbox{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px}
@@ -72,6 +72,7 @@ tr:last-child td{border-bottom:0}
 .qrbox p{margin:0;max-width:44ch;min-width:0;font-size:14px;color:var(--muted)}
 .foot{font-size:13px;color:var(--muted)}
 </style>
+</head><body>
 <main class="wrap">
 <div class="note"><b>Synthetic example.</b> Produced by the Digital Cement Passport pilot. The batch, plant and every value are invented. This is not a real cement, a conformity assessment or proof of regulatory compliance.</div>
 
@@ -84,7 +85,7 @@ tr:last-child td{border-bottom:0}
     <div class="fig"><span class="k">Clinker</span><span class="v">74<span> %</span></span></div>
     <div class="fig"><span class="k">28-day strength</span><span class="v">48<span> MPa</span></span></div>
     <div class="fig"><span class="k">Soluble Cr(VI)</span><span class="v">1.2<span> / 2 mg/kg</span></span>
-      <div class="meter" aria-hidden="true"><i style="width:60%"></i></div><span class="s">Below the REACH limit</span></div>
+      <div class="meter" aria-hidden="true"><i style="width:60%"></i></div><span class="s">At or below the REACH limit</span></div>
     <div class="fig"><span class="k">GWP A1–A3</span><span class="v">612<span> kg CO₂e</span></span><span class="s" style="color:var(--muted)">per 1 t cement</span></div>
   </div>
 </article>
@@ -93,7 +94,7 @@ tr:last-child td{border-bottom:0}
 <div class="panel"><dl><dt>Batch ID</dt><dd><span class="mono">DCP-EX-2026-000123</span></dd><dt>Cement type (EN 197-1)</dt><dd>CEM II/B-V</dd><dt>Plant</dt><dd>Example Cement Plant (fictitious)</dd><dt>Energy source</dt><dd>Mixed</dd><dt>Passport address</dt><dd><span class="mono">https://example.org/dcp/passport/DCP-EX-2026-000123</span></dd></dl></div></section>
 
 <section><h2><span class="chip public">Public</span>Where the carbon comes from</h2>
-<div class="panel"><div class="bars" role="img" aria-label="GWP-total per EN 15804 module"><div class="brow"><b>A1</b><div class="t"><i style="width:100.0%"></i></div><span class="val">560</span></div><div class="brow"><b>A2</b><div class="t"><i style="width:2.1%"></i></div><span class="val">12</span></div><div class="brow"><b>A3</b><div class="t"><i style="width:7.1%"></i></div><span class="val">40</span></div><div class="brow"><b>C1</b><div class="t"><i style="width:0.2%"></i></div><span class="val">1</span></div><div class="brow"><b>C2</b><div class="t"><i style="width:0.5%"></i></div><span class="val">3</span></div><div class="brow"><b>C3</b><div class="t"><i style="width:0.4%"></i></div><span class="val">2</span></div><div class="brow"><b>C4</b><div class="t"><i style="width:0.3%"></i></div><span class="val">1.5</span></div></div>
+<div class="panel"><div class="bars" role="img" aria-label="GWP-total per EN 15804 module"><div class="brow"><b>A1</b><div class="t"><i style="left:0;width:100.0%"></i></div><span class="val">560</span></div><div class="brow"><b>A2</b><div class="t"><i style="left:0;width:2.1%"></i></div><span class="val">12</span></div><div class="brow"><b>A3</b><div class="t"><i style="left:0;width:7.1%"></i></div><span class="val">40</span></div><div class="brow"><b>C1</b><div class="t"><i style="left:0;width:0.2%"></i></div><span class="val">1</span></div><div class="brow"><b>C2</b><div class="t"><i style="left:0;width:0.5%"></i></div><span class="val">3</span></div><div class="brow"><b>C3</b><div class="t"><i style="left:0;width:0.4%"></i></div><span class="val">2</span></div><div class="brow"><b>C4</b><div class="t"><i style="left:0;width:0.3%"></i></div><span class="val">1.5</span></div></div>
 <p class="foot" style="margin:0 0 12px">GWP-total in kg CO₂e per 1 t cement, by EN 15804 module: A1 raw materials, A2 transport, A3 manufacturing, C1–C4 end of life.</p></div></section>
 
 <section><h2><span class="chip engineer">Engineer</span>Strength and documents</h2>
@@ -108,7 +109,7 @@ tr:last-child td{border-bottom:0}
 <div class="panel"><dl><dt>Water-soluble chromium VI</dt><dd>1.2 mg/kg (limit 2 mg/kg, REACH Annex XVII, entry 47)</dd><dt>Manufacturer ID</dt><dd><span class="mono">MFR-EXAMPLE-0001</span></dd><dt>Product SKU</dt><dd><span class="mono">SKU-EX-CEMIIBV-42.5N</span></dd><dt>Quarry location</dt><dd>0, 0 (placeholder)</dd></dl></div></section>
 
 <section><h2><span class="chip auditor">Auditor</span>EN 15804 indicators per 1 t cement</h2>
-<div class="panel"><div class="tablebox"><table><thead><tr><th>Module</th><th class="n">GWP-total kg CO₂e</th><th class="n">PERT MJ</th><th class="n">PENRT MJ</th><th>Source</th></tr></thead><tbody><tr><td class="mono">A1</td><td class="n">560</td><td class="n">120.0</td><td class="n">2100.0</td><td>EPD</td></tr><tr><td class="mono">A2</td><td class="n">12</td><td class="n">2.0</td><td class="n">160.0</td><td>supplyChainReport</td></tr><tr><td class="mono">A3</td><td class="n">40</td><td class="n">30.0</td><td class="n">450.0</td><td>IoT/MQTT</td></tr><tr><td class="mono">C1</td><td class="n">1</td><td class="n">–</td><td class="n">–</td><td>EPD</td></tr><tr><td class="mono">C2</td><td class="n">3</td><td class="n">–</td><td class="n">–</td><td>EPD</td></tr><tr><td class="mono">C3</td><td class="n">2</td><td class="n">–</td><td class="n">–</td><td>EPD</td></tr><tr><td class="mono">C4</td><td class="n">1.5</td><td class="n">–</td><td class="n">–</td><td>EPD</td></tr></tbody></table></div></div></section>
+<div class="panel"><div class="tablebox"><table><thead><tr><th>Module</th><th class="n">GWP-total kg CO₂e</th><th class="n">PERT MJ</th><th class="n">PENRT MJ</th><th>Source</th></tr></thead><tbody><tr><td class="mono">A1</td><td class="n">560</td><td class="n">120</td><td class="n">2100</td><td>EPD</td></tr><tr><td class="mono">A2</td><td class="n">12</td><td class="n">2</td><td class="n">160</td><td>supplyChainReport</td></tr><tr><td class="mono">A3</td><td class="n">40</td><td class="n">30</td><td class="n">450</td><td>plantSensor</td></tr><tr><td class="mono">C1</td><td class="n">1</td><td class="n">1</td><td class="n">15</td><td>EPD</td></tr><tr><td class="mono">C2</td><td class="n">3</td><td class="n">0.5</td><td class="n">40</td><td>EPD</td></tr><tr><td class="mono">C3</td><td class="n">2</td><td class="n">1</td><td class="n">20</td><td>EPD</td></tr><tr><td class="mono">C4</td><td class="n">1.5</td><td class="n">0.2</td><td class="n">10</td><td>EPD</td></tr></tbody></table></div></div></section>
 
 <div class="qrbox"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAADWElEQVR4Xu1cXW6jQAz2FKQ8EqkHyFHgBj3Sao/UG4Sj5AArhcdKIK/82QOkWmUg2gdX+HtAKIOQOx/+9zQx7UH/tudpIornnyP2J/ZnjRe+hyEZOn3RlEh/OxPZRVGHPhbxwv7vwivvrxgwaklYvYzEfCeiFhesy91L79+DV+Tfg2O+35RzODHumG81pQ6aDIg6q3Yfc3+2w/f+TAmamjrR6d/pxESDWOUFvuUv42jyP7Kn/rfm/vKVqOUpUX8Zg98d8Pb9KL+rJKnvKtVapuEddyNRIw8MYZ/L8MavhVFAe6/4nxdDxXz1Jn/I8xy1KaeGUUTUnysyq9x8aXy1LoHEfj6Hw/0ZaomfJUJWQhE1T4mvJJYa6RJWce9Q/l04mvzEzCOBS742SHOXdFjQSGLcjGq9wz6X4O37Ef8rXpcRJpv/BdNW1ZAFOGZhOvgtwRu/4n+F2uFM3HdW0EhStWJkSligATVLiaS9yR/yFIC6oyksTDPMsFplM818lSALiPj5h8VXkv9Wo1QgTU3bT6JEVI8svxmaP3XS50Jfflb8rPGVuV5pMsA0a8yFqAqrMOHhfzfA2/c/16+mBIdrf4KVroh70eH2Oskl8qMyvPFruoogekbWXwTROXtSx+xN/pCnHF8Jb0v+u/R6JaqCkdb8N+KrDfD2vWlcrP4XMIXNhWllFavhfzfAG7810fCuLUDuP+5EfcpVSWpGyX+xGvnvRnjjd12/wiyOWmWYax3csUkd+82b/CHPJv9rCZHZ4iU1ypVKkBzxVRnevrd5fqPi1N6kAikNI6ITJylNaqVSkiQx19E/KsIbv1kvG9FQzYWsXJkLHw9DlGGfC/DJ7zp0ViOdA2vzydYzDH5LcMjvAnQawOWcE2s7OA/uBL8leOP3zc4q6PyGDbljvj394tHOL+joRvjfDfDGb+4fIaoazpYf9R/W/9V0Cf3fPkX/qAxv/Ko8dn4hJ7zwujh6xHyf9CQSfHL0B0vwxu/jfLuUqZo7o9fLclwl6+9Zcqbgtwxv/H6XBwqrqREOMUjVGe7YOsHe5S/hmPJbritcytGj1MnMrFyoh5G+zWp+zP3ZDm/78/38wqrqrENYc7lDE2Nv8oc8zyFTGzsQ/5+hgPjeniP25//uz1+nHDy/wAv/KwAAAABJRU5ErkJggg==" alt="QR code of this passport"><p>Scan to open this passport on a phone. In a deployed system each role would see only its own sections; all are shown here for demonstration.</p></div>
 </main>

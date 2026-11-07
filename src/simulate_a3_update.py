@@ -11,6 +11,7 @@ Usage:
 import copy
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from jsonschema import Draft7Validator, FormatChecker
@@ -29,7 +30,8 @@ def message_schema(schema):
     """
     indicators = copy.deepcopy(schema["definitions"]["moduleIndicators"])
     indicators["properties"].pop("module")
-    indicators["required"] = [r for r in indicators["required"] if r != "module"]
+    # A message must say where the values come from and when they were measured.
+    indicators["required"] = [r for r in indicators["required"] if r != "module"] + ["dataSource", "lastUpdated"]
     return {
         "type": "object",
         "additionalProperties": False,
@@ -42,14 +44,28 @@ def message_schema(schema):
     }
 
 
+def _time(value):
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
 def apply_a3_update(record, message, schema=None):
     """Return (updated_record, problems). The input record is never modified."""
     schema = schema or load_schema()
+    base_problems = validate_record(record, schema)
+    if base_problems:
+        return record, [("(passport)", "the stored passport record is itself invalid; no update applied")] + base_problems
     v = Draft7Validator(message_schema(schema), format_checker=FormatChecker())
     problems = [(".".join(map(str, e.absolute_path)) or "(message root)", e.message)
                 for e in v.iter_errors(message)]
     if not problems and message["batchID"] != record["batchID"]:
         problems.append(("batchID", f"message for '{message['batchID']}' does not match passport '{record['batchID']}'"))
+    if not problems:
+        stored = next((e for e in record["lcaIndicators"]["indicatorsPerModule"] if e.get("module") == "A3"), None)
+        if stored is not None and "lastUpdated" in stored:
+            if _time(message["indicators"]["lastUpdated"]) <= _time(stored["lastUpdated"]):
+                problems.append(("indicators.lastUpdated",
+                                 f"message time {message['indicators']['lastUpdated']} is not later than the stored "
+                                 f"A3 update ({stored['lastUpdated']}); older or repeated messages are not recorded"))
     if problems:
         return record, problems
     updated = copy.deepcopy(record)
@@ -71,12 +87,15 @@ def demo(record_path):
     good = {"batchID": record["batchID"], "module": "A3",
             "indicators": {"gwpTotal": 41.5, "primaryEnergyRenewableTotal": 31.0,
                            "primaryEnergyNonRenewableTotal": 462.0,
-                           "dataSource": "IoT/MQTT", "lastUpdated": "2026-03-03T06:00:00Z"}}
+                           "dataSource": "plantSensor", "lastUpdated": "2026-03-03T06:00:00Z"}}
     bad = {"batchID": record["batchID"], "module": "A3",
-           "indicators": {"gwpTotal": 41.5, "primaryEnergyNonRenewableTotal": -5.0, "dataSource": "IoT/MQTT"}}
+           "indicators": dict(good["indicators"], primaryEnergyNonRenewableTotal=-5.0)}
     wrong_batch = dict(good, batchID="DCP-EX-2026-999999")
+    older = {"batchID": record["batchID"], "module": "A3",
+             "indicators": dict(good["indicators"], lastUpdated="2026-03-01T06:00:00Z")}
     results = []
-    for label, msg in (("valid message", good), ("negative energy value", bad), ("wrong batchID", wrong_batch)):
+    for label, msg in (("valid message", good), ("negative energy value", bad), ("wrong batchID", wrong_batch),
+                       ("message older than the stored A3 value", older)):
         updated, problems = apply_a3_update(record, msg)
         results.append((label, msg, updated, problems))
     return results

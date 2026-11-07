@@ -23,7 +23,7 @@
     "passportURI": {
       "type": "string",
       "format": "uri",
-      "description": "Resolvable URI of the batch passport; this is the content of the QR data carrier."
+      "description": "Resolvable URI of the batch passport; content of the QR data carrier. In this pilot its last path segment must equal the batchID (checked by validate_passport.py)."
     },
     "traceability": {
       "type": "object",
@@ -120,6 +120,21 @@
                   "additive"
                 ]
               },
+              "en197Constituent": {
+                "enum": [
+                  "K",
+                  "S",
+                  "D",
+                  "P",
+                  "Q",
+                  "V",
+                  "W",
+                  "T",
+                  "L",
+                  "LL"
+                ],
+                "description": "Constituent notation of EN 197-1: K clinker, S blast-furnace slag, D silica fume, P natural pozzolana, Q natural calcined pozzolana, V siliceous fly ash, W calcareous fly ash, T burnt shale, L and LL limestone."
+              },
               "casNumber": {
                 "type": "string",
                 "pattern": "^\\d{2,7}-\\d{2}-\\d$"
@@ -129,7 +144,80 @@
                 "minimum": 0,
                 "maximum": 100
               }
-            }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "role": {
+                      "enum": [
+                        "clinker",
+                        "mainConstituent",
+                        "minorAdditionalConstituent"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "en197Constituent"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "role": {
+                      "const": "clinker"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "en197Constituent": {
+                      "const": "K"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "role": {
+                      "const": "mainConstituent"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "en197Constituent": {
+                      "not": {
+                        "const": "K"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "role": {
+                      "enum": [
+                        "calciumSulfate",
+                        "additive"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "not": {
+                    "required": [
+                      "en197Constituent"
+                    ]
+                  }
+                }
+              }
+            ]
           }
         }
       },
@@ -599,6 +687,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "earlyStrength",
         "standardStrength28Days"
       ],
       "properties": {
@@ -666,8 +755,8 @@
       ],
       "properties": {
         "declaredUnit": {
-          "type": "string",
-          "minLength": 1
+          "const": "1 t cement",
+          "description": "Declared unit, fixed to 1 t of cement in this pilot so that values of different batches can be compared without unit conversion."
         },
         "indicatorsPerModule": {
           "type": "array",
@@ -720,18 +809,12 @@
                 "maximum": 52.5
               },
               "earlyStrength": {
-                "if": {
-                  "properties": {
-                    "ageDays": {
-                      "const": 7
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "value": {
-                      "minimum": 12.0
-                    }
+                "properties": {
+                  "ageDays": {
+                    "const": 7
+                  },
+                  "value": {
+                    "minimum": 12.0
                   }
                 }
               }
@@ -767,18 +850,12 @@
                 "maximum": 52.5
               },
               "earlyStrength": {
-                "if": {
-                  "properties": {
-                    "ageDays": {
-                      "const": 7
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "value": {
-                      "minimum": 16.0
-                    }
+                "properties": {
+                  "ageDays": {
+                    "const": 7
+                  },
+                  "value": {
+                    "minimum": 16.0
                   }
                 }
               }
@@ -814,18 +891,12 @@
                 "maximum": 52.5
               },
               "earlyStrength": {
-                "if": {
-                  "properties": {
-                    "ageDays": {
-                      "const": 2
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "value": {
-                      "minimum": 10.0
-                    }
+                "properties": {
+                  "ageDays": {
+                    "const": 2
+                  },
+                  "value": {
+                    "minimum": 10.0
                   }
                 }
               }
@@ -861,18 +932,12 @@
                 "maximum": 62.5
               },
               "earlyStrength": {
-                "if": {
-                  "properties": {
-                    "ageDays": {
-                      "const": 7
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "value": {
-                      "minimum": 16.0
-                    }
+                "properties": {
+                  "ageDays": {
+                    "const": 7
+                  },
+                  "value": {
+                    "minimum": 16.0
                   }
                 }
               }
@@ -908,18 +973,12 @@
                 "maximum": 62.5
               },
               "earlyStrength": {
-                "if": {
-                  "properties": {
-                    "ageDays": {
-                      "const": 2
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "value": {
-                      "minimum": 10.0
-                    }
+                "properties": {
+                  "ageDays": {
+                    "const": 2
+                  },
+                  "value": {
+                    "minimum": 10.0
                   }
                 }
               }
@@ -955,18 +1014,12 @@
                 "maximum": 62.5
               },
               "earlyStrength": {
-                "if": {
-                  "properties": {
-                    "ageDays": {
-                      "const": 2
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "value": {
-                      "minimum": 20.0
-                    }
+                "properties": {
+                  "ageDays": {
+                    "const": 2
+                  },
+                  "value": {
+                    "minimum": 20.0
                   }
                 }
               }
@@ -1001,18 +1054,12 @@
                 "minimum": 52.5
               },
               "earlyStrength": {
-                "if": {
-                  "properties": {
-                    "ageDays": {
-                      "const": 2
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "value": {
-                      "minimum": 10.0
-                    }
+                "properties": {
+                  "ageDays": {
+                    "const": 2
+                  },
+                  "value": {
+                    "minimum": 10.0
                   }
                 }
               }
@@ -1047,18 +1094,12 @@
                 "minimum": 52.5
               },
               "earlyStrength": {
-                "if": {
-                  "properties": {
-                    "ageDays": {
-                      "const": 2
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "value": {
-                      "minimum": 20.0
-                    }
+                "properties": {
+                  "ageDays": {
+                    "const": 2
+                  },
+                  "value": {
+                    "minimum": 20.0
                   }
                 }
               }
@@ -1093,18 +1134,12 @@
                 "minimum": 52.5
               },
               "earlyStrength": {
-                "if": {
-                  "properties": {
-                    "ageDays": {
-                      "const": 2
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "value": {
-                      "minimum": 30.0
-                    }
+                "properties": {
+                  "ageDays": {
+                    "const": 2
+                  },
+                  "value": {
+                    "minimum": 30.0
                   }
                 }
               }
@@ -1204,7 +1239,9 @@
       "additionalProperties": false,
       "required": [
         "module",
-        "gwpTotal"
+        "gwpTotal",
+        "primaryEnergyRenewableTotal",
+        "primaryEnergyNonRenewableTotal"
       ],
       "properties": {
         "module": {
@@ -1238,9 +1275,10 @@
           "enum": [
             "EPD",
             "supplyChainReport",
-            "IoT/MQTT",
+            "plantSensor",
             "siteInspection"
-          ]
+          ],
+          "description": "Origin of the values (vocabulary of this pilot). The transport protocol (e.g. MQTT) is not a data source."
         },
         "lastUpdated": {
           "type": "string",

@@ -26,6 +26,37 @@ def _module_b1(d):
     d["lcaIndicators"]["indicatorsPerModule"].append({"module": "B1", "gwpTotal": 1.0})
 
 
+def _drop_penrt_a1(d):
+    del d["lcaIndicators"]["indicatorsPerModule"][0]["primaryEnergyNonRenewableTotal"]
+
+
+def _class_32_5n(d):
+    d["composition"]["strengthClass"] = "32.5N"
+
+
+def _drop_early_strength(d):
+    del d["strength"]["earlyStrength"]
+
+
+def _cem_ii_b_m_single(d):
+    d["composition"]["cementType"] = "CEM II/B-M"
+
+
+def _cem_v_a_low_slag(d):
+    comp = d["composition"]
+    comp["cementType"] = "CEM V/A"
+    comp["clinkerRatio"] = 50.0
+    comp["constituents"] = [
+        {"name": "Portland cement clinker", "role": "clinker", "en197Constituent": "K",
+         "casNumber": "65997-16-2", "massPercent": 47.5},
+        {"name": "Granulated blast-furnace slag", "role": "mainConstituent", "en197Constituent": "S",
+         "casNumber": "65996-69-2", "massPercent": 10.0},
+        {"name": "Siliceous fly ash", "role": "mainConstituent", "en197Constituent": "V",
+         "casNumber": "68131-74-8", "massPercent": 37.5},
+        {"name": "Gypsum", "role": "calciumSulfate", "casNumber": "13397-24-5", "massPercent": 5.0},
+    ]
+
+
 def _duplicate_a3(d):
     entries = d["lcaIndicators"]["indicatorsPerModule"]
     entries.append(copy.deepcopy(next(e for e in entries if e["module"] == "A3")))
@@ -61,6 +92,28 @@ CASES = [
      "CAS Registry Number fails its check digit", "composition.constituents.0.casNumber"),
     ("14-duplicate-a3-module", _duplicate_a3,
      "module A3 declared twice", "lcaIndicators.indicatorsPerModule"),
+    ("15-early-strength-wrong-age", _class_32_5n,
+     "a 2-day early strength cannot show class 32.5N, whose early strength is specified at 7 days (EN 197-1, Table 3)",
+     "strength.earlyStrength.ageDays"),
+    ("16-passport-uri-other-batch", _set(["passportURI"], "https://example.org/dcp/passport/DCP-EX-2026-000999"),
+     "passport URI points to a different batch than the batchID", "passportURI"),
+    ("17-other-declared-unit", _set(["lcaIndicators", "declaredUnit"], "1 kg cement"),
+     "declared unit other than 1 t cement (fixed in this pilot for comparability)", "lcaIndicators.declaredUnit"),
+    ("18-missing-penrt", _drop_penrt_a1,
+     "PENRT missing for module A1 (GWP-total, PERT and PENRT are required for every declared module)",
+     "lcaIndicators.indicatorsPerModule.0"),
+    ("19-missing-early-strength", _drop_early_strength,
+     "early strength missing; the strength class is defined by early and 28-day strength (EN 197-1, Table 3)",
+     "strength"),
+    ("20-constituent-type-not-in-cement-type", _set(["composition", "constituents", 1, "en197Constituent"], "LL"),
+     "main constituent LL (limestone) declared in a CEM II/B-V cement, whose main constituent is V (EN 197-1, Table 1)",
+     "composition.constituents.1.en197Constituent"),
+    ("21-composite-cement-with-one-main-constituent", _cem_ii_b_m_single,
+     "CEM II/B-M declared with only one main constituent besides clinker (two or more required, EN 197-1, Table 1)",
+     "composition.constituents"),
+    ("22-cem-v-slag-share-too-low", _cem_v_a_low_slag,
+     "CEM V/A with blast-furnace slag at 10.5 % of the main and minor constituents (18-30 % required, EN 197-1, Table 1)",
+     "composition.constituents"),
 ]
 
 

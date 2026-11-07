@@ -38,6 +38,40 @@ class SchemaTests(unittest.TestCase):
                 self.assertTrue(problems, f"{name} was accepted")
                 self.assertIn(exp["expectedErrorLocation"], [loc for loc, _ in problems])
 
+    def test_en197_composition_rules(self):
+        base = load(ROOT / "examples" / "batch-valid.json")
+
+        def record(cement_type, ratio, mains, minor=0.0):
+            rec = json.loads(json.dumps(base))
+            clinker = ratio * 0.95
+            items = [{"name": "Clinker", "role": "clinker", "en197Constituent": "K",
+                      "casNumber": "65997-16-2", "massPercent": round(clinker, 4)}]
+            items += [{"name": code, "role": "mainConstituent", "en197Constituent": code,
+                       "casNumber": "68131-74-8", "massPercent": round(share * 0.95, 4)} for code, share in mains]
+            if minor:
+                items.append({"name": "Limestone", "role": "minorAdditionalConstituent", "en197Constituent": "LL",
+                              "casNumber": "1317-65-3", "massPercent": round(minor * 0.95, 4)})
+            items.append({"name": "Gypsum", "role": "calciumSulfate", "casNumber": "13397-24-5", "massPercent": 5.0})
+            rec["composition"].update(cementType=cement_type, clinkerRatio=ratio, constituents=items)
+            return rec
+
+        accepted = [record("CEM II/B-M", 70, [("S", 15), ("LL", 15)]),
+                    record("CEM V/A", 50, [("S", 25), ("V", 25)]),
+                    record("CEM IV/A", 75, [("D", 10), ("P", 15)]),
+                    record("CEM III/B", 25, [("S", 75)]),
+                    record("CEM II/A-V", 88, [("V", 10)], minor=2)]
+        rejected = [record("CEM II/B-M", 70, [("V", 30)]),                 # only one main constituent
+                    record("CEM V/A", 50, [("S", 10), ("V", 40)]),         # slag below 18 %
+                    record("CEM IV/A", 75, [("D", 15), ("P", 10)]),        # silica fume above 10 %
+                    record("CEM II/A-V", 88, [("V", 4)], minor=8),         # minor constituents above 5 %
+                    record("CEM II/A-V", 94, [("V", 1)], minor=5)]         # V below 6 %
+        for rec in accepted:
+            with self.subTest(accept=rec["composition"]["cementType"]):
+                self.assertEqual(validate_record(rec, self.schema), [])
+        for rec in rejected:
+            with self.subTest(reject=rec["composition"]["cementType"]):
+                self.assertIn("composition.constituents", [loc for loc, _ in validate_record(rec, self.schema)])
+
     def test_cas_check_digit(self):
         for cas in ("65997-16-2", "13397-24-5", "68131-74-8", "7732-18-5"):
             self.assertTrue(cas_check_digit_ok(cas), cas)
@@ -85,6 +119,17 @@ class QrTests(unittest.TestCase):
             for expected in (record["batchID"], "CEM II/B-V", "42.5N", "Synthetic example", "65997-16-2"):
                 self.assertIn(expected, page)
 
+    def test_passport_page_renders_without_a1_a3_and_with_negative_values(self):
+        record = load(ROOT / "examples" / "batch-valid.json")
+        only_c = {**record, "lcaIndicators": {**record["lcaIndicators"], "indicatorsPerModule": [
+            e for e in record["lcaIndicators"]["indicatorsPerModule"] if e["module"].startswith("C")]}}
+        negative = {**record, "lcaIndicators": {**record["lcaIndicators"], "indicatorsPerModule": [
+            {**e, "gwpTotal": -e["gwpTotal"]} if e["module"] == "C3" else e
+            for e in record["lcaIndicators"]["indicatorsPerModule"]]}}
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertIn("Not available", render(only_c, tmp).read_text(encoding="utf-8"))
+            self.assertIn("-2", render(negative, tmp).read_text(encoding="utf-8"))
+
     def test_invalid_record_gets_no_qr(self):
         record = load(ROOT / "examples" / "invalid" / "01-chromium-vi-above-limit.json")
         with tempfile.TemporaryDirectory() as tmp, self.assertRaises(ValueError):
@@ -112,10 +157,53 @@ class ViewAndUpdateTests(unittest.TestCase):
         self.assertTrue(outcomes["negative energy value"])
         self.assertTrue(outcomes["wrong batchID"])
 
+    def test_a3_update_replaces_only_module_a3(self):
+        msg = {"batchID": self.record["batchID"], "module": "A3",
+               "indicators": {"gwpTotal": 41.5, "primaryEnergyRenewableTotal": 31.0,
+                              "primaryEnergyNonRenewableTotal": 462.0, "dataSource": "plantSensor",
+                              "lastUpdated": "2026-03-03T06:00:00Z"}}
+        updated, problems = apply_a3_update(self.record, msg)
+        self.assertEqual(problems, [])
+        before = {e["module"]: e for e in self.record["lcaIndicators"]["indicatorsPerModule"]}
+        after = {e["module"]: e for e in updated["lcaIndicators"]["indicatorsPerModule"]}
+        self.assertEqual(after["A3"]["gwpTotal"], 41.5)
+        self.assertEqual(after["A3"]["primaryEnergyNonRenewableTotal"], 462.0)
+        self.assertEqual(len(after), len(before))
+        for module in before:
+            if module != "A3":
+                self.assertEqual(after[module], before[module])
+
+    def test_a3_update_rejects_messages_without_source_or_time_and_older_messages(self):
+        good = {"batchID": self.record["batchID"], "module": "A3",
+                "indicators": {"gwpTotal": 41.5, "primaryEnergyRenewableTotal": 31.0,
+                               "primaryEnergyNonRenewableTotal": 462.0, "dataSource": "plantSensor",
+                               "lastUpdated": "2026-03-03T06:00:00Z"}}
+        self.assertEqual(apply_a3_update(self.record, good)[1], [])
+        for field in ("dataSource", "lastUpdated"):
+            msg = {**good, "indicators": {k: v for k, v in good["indicators"].items() if k != field}}
+            self.assertTrue(apply_a3_update(self.record, msg)[1], field)
+        stored_time = next(e["lastUpdated"] for e in self.record["lcaIndicators"]["indicatorsPerModule"]
+                           if e["module"] == "A3")
+        same_time = {**good, "indicators": {**good["indicators"], "lastUpdated": stored_time}}
+        self.assertTrue(apply_a3_update(self.record, same_time)[1])
+
+    def test_a3_update_on_an_invalid_passport_reports_instead_of_crashing(self):
+        broken = {k: v for k, v in self.record.items() if k != "lcaIndicators"}
+        msg = {"batchID": self.record["batchID"], "module": "A3",
+               "indicators": {"gwpTotal": 1.0, "primaryEnergyRenewableTotal": 1.0,
+                              "primaryEnergyNonRenewableTotal": 1.0, "dataSource": "plantSensor",
+                              "lastUpdated": "2026-03-03T06:00:00Z"}}
+        updated, problems = apply_a3_update(broken, msg)
+        self.assertTrue(problems)
+        self.assertIs(updated, broken)
+
     def test_a3_update_does_not_modify_the_input(self):
         before = json.dumps(self.record, sort_keys=True)
         apply_a3_update(self.record, {"batchID": self.record["batchID"], "module": "A3",
-                                      "indicators": {"gwpTotal": 1.0}})
+                                      "indicators": {"gwpTotal": 1.0, "primaryEnergyRenewableTotal": 1.0,
+                                                     "primaryEnergyNonRenewableTotal": 1.0,
+                                                     "dataSource": "plantSensor",
+                                                     "lastUpdated": "2026-03-03T06:00:00Z"}})
         self.assertEqual(before, json.dumps(self.record, sort_keys=True))
 
 
@@ -152,8 +240,67 @@ class CrossLayerConsistencyTests(unittest.TestCase):
         keys = self.schema_keys(load_schema(), set())
         self.assertEqual(names, keys)
 
+    def test_ttl_and_schema_agree_on_required_fields_and_allowed_values(self):
+        try:
+            import rdflib
+            from rdflib.collection import Collection
+        except ImportError:
+            self.skipTest("rdflib not installed (optional)")
+        g = rdflib.Graph().parse(ROOT / "model" / "CementPassport.ttl", format="turtle")
+        samm = rdflib.Namespace("urn:samm:org.eclipse.esmf.samm:meta-model:2.1.0#")
+        sammc = rdflib.Namespace("urn:samm:org.eclipse.esmf.samm:characteristic:2.1.0#")
+        schema = load_schema()
+
+        def resolve(node):
+            while isinstance(node, dict) and "$ref" in node:
+                node = schema["definitions"][node["$ref"].split("/")[-1]]
+            return node
+
+        objects, allowed = [], {}
+
+        def walk(node):
+            node = resolve(node)
+            if isinstance(node, dict):
+                if "properties" in node and "type" in node:
+                    objects.append(node)
+                for key, sub in node.get("properties", {}).items():
+                    sub = resolve(sub)
+                    if isinstance(sub, dict) and ("enum" in sub or "const" in sub):
+                        allowed.setdefault(key, set()).update(sub.get("enum", [sub.get("const")]))
+                for value in node.values():
+                    if isinstance(value, (dict, list)):
+                        walk(value)
+            elif isinstance(node, list):
+                for value in node:
+                    walk(value)
+
+        walk(schema)
+        local = lambda uri: str(uri).split("#")[1]
+        checked = 0
+        for kind in (samm.Entity, samm.Aspect):
+            for entity in g.subjects(rdflib.RDF.type, kind):
+                props = {}
+                for item in Collection(g, g.value(entity, samm.properties)):
+                    if isinstance(item, rdflib.BNode):
+                        name = str(g.value(item, samm.payloadName) or local(g.value(item, samm.property)))
+                        props[name] = bool(g.value(item, samm.optional))
+                    else:
+                        props[local(item)] = False
+                matches = [o for o in objects if set(o["properties"]) == set(props)]
+                self.assertTrue(matches, f"no schema object with the fields of {local(entity)}")
+                for obj in matches:
+                    self.assertEqual(set(obj.get("required", [])), {n for n, opt in props.items() if not opt},
+                                     local(entity))
+                checked += 1
+        self.assertGreaterEqual(checked, 10)
+        for prop in g.subjects(rdflib.RDF.type, samm.Property):
+            char = g.value(prop, samm.characteristic)
+            if (char, rdflib.RDF.type, sammc.Enumeration) in g:
+                values = {v.toPython() for v in Collection(g, g.value(char, sammc["values"]))}
+                self.assertEqual(values, allowed[local(prop)], local(prop))
+
     def test_listing1_excerpt_is_an_exact_subset_of_the_schema(self):
-        """The abridged excerpt printed in the article must not differ from the full schema."""
+        """The abridged excerpt intended for print must not differ from the full schema."""
         excerpt = load(ROOT / "schema" / "listing1_excerpt.json")
         full = load_schema()
 

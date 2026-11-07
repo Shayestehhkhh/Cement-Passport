@@ -20,6 +20,8 @@ Python 3.13.18, jsonschema 4.26.0, qrcode 8.2
   REJECTED  invalid/07-latitude-out-of-range.json  (expected: latitude outside -90..90) -> as expected
             - traceability.quarryLocation.latitude: 95.0 is greater than the maximum of 90
   REJECTED  invalid/08-undefined-lca-module.json  (expected: module B1 is outside the passport scope (A1-A3, C1-C4)) -> as expected
+            - lcaIndicators.indicatorsPerModule.7: 'primaryEnergyRenewableTotal' is a required property
+            - lcaIndicators.indicatorsPerModule.7: 'primaryEnergyNonRenewableTotal' is a required property
             - lcaIndicators.indicatorsPerModule.7.module: 'B1' is not one of ['A1', 'A2', 'A3', 'A1-A3', 'C1', 'C2', 'C3', 'C4']
   REJECTED  invalid/09-missing-batch-id.json  (expected: mandatory batchID missing) -> as expected
             - (record root): 'batchID' is a required property
@@ -29,10 +31,30 @@ Python 3.13.18, jsonschema 4.26.0, qrcode 8.2
             - passportURI: 'passport DCP-EX-2026-000123' is not a 'uri'
   REJECTED  invalid/12-L-class-with-non-CEM-III.json  (expected: low early strength (L) classes apply only to CEM III cements (EN 197-1)) -> as expected
             - composition.cementType: 'CEM II/B-V' is not one of ['CEM III/A', 'CEM III/B', 'CEM III/C']
+            - strength.earlyStrength.ageDays: 7 was expected
   REJECTED  invalid/13-cas-check-digit-wrong.json  (expected: CAS Registry Number fails its check digit) -> as expected
             - composition.constituents.0.casNumber: '65997-16-3' fails the CAS Registry Number check digit
   REJECTED  invalid/14-duplicate-a3-module.json  (expected: module A3 declared twice) -> as expected
             - lcaIndicators.indicatorsPerModule: module A3 is declared more than once
+  REJECTED  invalid/15-early-strength-wrong-age.json  (expected: a 2-day early strength cannot show class 32.5N, whose early strength is specified at 7 days (EN 197-1, Table 3)) -> as expected
+            - strength.earlyStrength.ageDays: 7 was expected
+  REJECTED  invalid/16-passport-uri-other-batch.json  (expected: passport URI points to a different batch than the batchID) -> as expected
+            - passportURI: passport URI ends with 'DCP-EX-2026-000999', not with the batchID 'DCP-EX-2026-000123'
+  REJECTED  invalid/17-other-declared-unit.json  (expected: declared unit other than 1 t cement (fixed in this pilot for comparability)) -> as expected
+            - lcaIndicators.declaredUnit: '1 t cement' was expected
+  REJECTED  invalid/18-missing-penrt.json  (expected: PENRT missing for module A1 (GWP-total, PERT and PENRT are required for every declared module)) -> as expected
+            - lcaIndicators.indicatorsPerModule.0: 'primaryEnergyNonRenewableTotal' is a required property
+  REJECTED  invalid/19-missing-early-strength.json  (expected: early strength missing; the strength class is defined by early and 28-day strength (EN 197-1, Table 3)) -> as expected
+            - strength: 'earlyStrength' is a required property
+  REJECTED  invalid/20-constituent-type-not-in-cement-type.json  (expected: main constituent LL (limestone) declared in a CEM II/B-V cement, whose main constituent is V (EN 197-1, Table 1)) -> as expected
+            - composition.constituents.1.en197Constituent: main constituent 'LL' is not allowed in CEM II/B-V (EN 197-1, Table 1)
+            - composition.constituents: CEM II/B-V requires at least 1 different main constituents besides clinker; found 0 (EN 197-1, Table 1)
+            - composition.constituents: V is 0.0 % of the main and minor constituents; CEM II/B-V requires 21-35 % (EN 197-1, Table 1)
+  REJECTED  invalid/21-composite-cement-with-one-main-constituent.json  (expected: CEM II/B-M declared with only one main constituent besides clinker (two or more required, EN 197-1, Table 1)) -> as expected
+            - composition.constituents: CEM II/B-M requires at least 2 different main constituents besides clinker; found 1 (EN 197-1, Table 1)
+  REJECTED  invalid/22-cem-v-slag-share-too-low.json  (expected: CEM V/A with blast-furnace slag at 10.5 % of the main and minor constituents (18-30 % required, EN 197-1, Table 1)) -> as expected
+            - composition.constituents: S is 10.5 % of the main and minor constituents; CEM V/A requires 18-30 % (EN 197-1, Table 1)
+            - composition.constituents: P/Q/V is 39.5 % of the main and minor constituents; CEM V/A requires 18-30 % (EN 197-1, Table 1)
 
 [2] The cement passport of the accepted synthetic batch
   CEMENT PASSPORT (synthetic example)
@@ -59,6 +81,8 @@ Python 3.13.18, jsonschema 4.26.0, qrcode 8.2
             - indicators.primaryEnergyNonRenewableTotal: -5.0 is less than the minimum of 0
   DISCARDED wrong batchID
             - batchID: message for 'DCP-EX-2026-999999' does not match passport 'DCP-EX-2026-000123'
+  DISCARDED message older than the stored A3 value
+            - indicators.lastUpdated: message time 2026-03-01T06:00:00Z is not later than the stored A3 update (2026-03-02T18:00:00Z); older or repeated messages are not recorded
 
 ========================================================================
 RESULT: all checks behaved as expected

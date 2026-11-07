@@ -54,5 +54,37 @@
   "14-duplicate-a3-module.json": {
     "expectedRejectionReason": "module A3 declared twice",
     "expectedErrorLocation": "lcaIndicators.indicatorsPerModule"
+  },
+  "15-early-strength-wrong-age.json": {
+    "expectedRejectionReason": "a 2-day early strength cannot show class 32.5N, whose early strength is specified at 7 days (EN 197-1, Table 3)",
+    "expectedErrorLocation": "strength.earlyStrength.ageDays"
+  },
+  "16-passport-uri-other-batch.json": {
+    "expectedRejectionReason": "passport URI points to a different batch than the batchID",
+    "expectedErrorLocation": "passportURI"
+  },
+  "17-other-declared-unit.json": {
+    "expectedRejectionReason": "declared unit other than 1 t cement (fixed in this pilot for comparability)",
+    "expectedErrorLocation": "lcaIndicators.declaredUnit"
+  },
+  "18-missing-penrt.json": {
+    "expectedRejectionReason": "PENRT missing for module A1 (GWP-total, PERT and PENRT are required for every declared module)",
+    "expectedErrorLocation": "lcaIndicators.indicatorsPerModule.0"
+  },
+  "19-missing-early-strength.json": {
+    "expectedRejectionReason": "early strength missing; the strength class is defined by early and 28-day strength (EN 197-1, Table 3)",
+    "expectedErrorLocation": "strength"
+  },
+  "20-constituent-type-not-in-cement-type.json": {
+    "expectedRejectionReason": "main constituent LL (limestone) declared in a CEM II/B-V cement, whose main constituent is V (EN 197-1, Table 1)",
+    "expectedErrorLocation": "composition.constituents.1.en197Constituent"
+  },
+  "21-composite-cement-with-one-main-constituent.json": {
+    "expectedRejectionReason": "CEM II/B-M declared with only one main constituent besides clinker (two or more required, EN 197-1, Table 1)",
+    "expectedErrorLocation": "composition.constituents"
+  },
+  "22-cem-v-slag-share-too-low.json": {
+    "expectedRejectionReason": "CEM V/A with blast-furnace slag at 10.5 % of the main and minor constituents (18-30 % required, EN 197-1, Table 1)",
+    "expectedErrorLocation": "composition.constituents"
   }
 }

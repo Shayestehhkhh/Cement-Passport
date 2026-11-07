@@ -1,9 +1,9 @@
 """Print a role-dependent view of a DCP batch record.
 
-Illustrates the 'permissions and access control' element of the framework: each role
-sees only the fields assigned to it. The role-to-field assignment is an illustrative
-design choice of this pilot, not a requirement taken from a standard. No ratings or
-grades are computed.
+Illustrates role-dependent data views: each role sees only the fields assigned to it.
+This is data filtering only; no authentication or authorization is implemented. The
+role-to-field assignment is an illustrative design choice of this pilot, not a
+requirement taken from a standard. No ratings or grades are computed.
 
 Usage:
     python src/passport_report.py examples/batch-valid.json [public|engineer|auditor]

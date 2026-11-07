@@ -10,6 +10,7 @@ Usage:
 import json
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 from jsonschema import Draft7Validator, FormatChecker
 
@@ -18,6 +19,35 @@ SCHEMA_PATH = ROOT / "schema" / "dcp-batch.schema.json"
 
 # Tolerance used for the two arithmetic consistency checks below (percentage points).
 TOLERANCE_PP = 0.5
+
+# EN 197-1:2011, Table 1 - main constituents other than clinker (K). Shares are in % of the
+# sum of main and minor additional constituents (calcium sulfate and additives excluded).
+_POZZOLANIC = {"D", "P", "Q", "V", "W"}
+_ALL_MAIN = {"S", "D", "P", "Q", "V", "W", "T", "L", "LL"}
+MINOR_MAX = 5.0  # minor additional constituents, 0-5 %
+
+
+def main_constituent_rules(cement_type):
+    """Return (allowed codes, [(codes, min %, max %)], minimum number of distinct codes)."""
+    if cement_type == "CEM I":
+        return set(), [], 0
+    if cement_type.startswith("CEM II/"):
+        cls, letter = cement_type[len("CEM II/"):].split("-", 1)
+        if letter == "M":  # Portland-composite: two or more main constituents besides clinker
+            return set(_ALL_MAIN), [(set(_ALL_MAIN), 12, 20) if cls == "A" else (set(_ALL_MAIN), 21, 35)], 2
+        if letter == "D":
+            return {"D"}, [({"D"}, 6, 10)], 1
+        return {letter}, [({letter}, 6, 20) if cls == "A" else ({letter}, 21, 35)], 1
+    if cement_type.startswith("CEM III/"):
+        rng = {"A": (36, 65), "B": (66, 80), "C": (81, 95)}[cement_type[-1]]
+        return {"S"}, [({"S"},) + rng], 1
+    if cement_type.startswith("CEM IV/"):
+        rng = (11, 35) if cement_type.endswith("A") else (36, 55)
+        return set(_POZZOLANIC), [(set(_POZZOLANIC),) + rng, ({"D"}, 0, 10)], 1
+    if cement_type.startswith("CEM V/"):
+        rng = (18, 30) if cement_type.endswith("A") else (31, 49)
+        return {"S", "P", "Q", "V"}, [({"S"},) + rng, ({"P", "Q", "V"},) + rng], 2
+    return None, [], 0
 
 
 def load_schema(path=SCHEMA_PATH):
@@ -60,6 +90,38 @@ def validate_record(record, schema=None):
                 if not cas_check_digit_ok(cas):
                     problems.append((f"composition.constituents.{i}.casNumber",
                                      f"'{cas}' fails the CAS Registry Number check digit"))
+        ctype = comp.get("cementType")
+        allowed, ranges, min_distinct = (main_constituent_rules(ctype) if isinstance(ctype, str)
+                                         else (None, [], 0))
+        shares_ok = all(isinstance(c.get("massPercent"), (int, float)) for c in items)
+        if allowed is not None:
+            mains = [c for c in items if c.get("role") == "mainConstituent"]
+            for i, c in enumerate(items):
+                code = c.get("en197Constituent")
+                if c.get("role") == "mainConstituent" and isinstance(code, str) and code not in allowed:
+                    problems.append((f"composition.constituents.{i}.en197Constituent",
+                                     f"main constituent '{code}' is not allowed in {ctype} (EN 197-1, Table 1)"))
+            distinct = {c.get("en197Constituent") for c in mains} & allowed
+            if len(distinct) < min_distinct:
+                problems.append(("composition.constituents",
+                                 f"{ctype} requires at least {min_distinct} different main constituents besides "
+                                 f"clinker; found {len(distinct)} (EN 197-1, Table 1)"))
+            nucleus = sum(c["massPercent"] for c in items
+                          if c.get("role") not in ("calciumSulfate", "additive")) if shares_ok else 0
+            if nucleus > 0:
+                minor = 100.0 * sum(c["massPercent"] for c in items
+                                    if c.get("role") == "minorAdditionalConstituent") / nucleus
+                if round(minor, 1) > MINOR_MAX:
+                    problems.append(("composition.constituents",
+                                     f"minor additional constituents are {minor:.1f} % of the main and minor "
+                                     f"constituents; maximum {MINOR_MAX:g} % (EN 197-1, Table 1)"))
+                for codes, lo, hi in ranges:
+                    share = 100.0 * sum(c["massPercent"] for c in mains
+                                        if c.get("en197Constituent") in codes) / nucleus
+                    if not lo <= round(share, 1) <= hi:
+                        problems.append(("composition.constituents",
+                                         f"{'/'.join(sorted(codes))} is {share:.1f} % of the main and minor "
+                                         f"constituents; {ctype} requires {lo}-{hi} % (EN 197-1, Table 1)"))
         shares = [c.get("massPercent") for c in items]
         if all(isinstance(s, (int, float)) for s in shares) and shares:
             total = sum(shares)
@@ -75,6 +137,15 @@ def validate_record(record, schema=None):
                     problems.append(("composition.clinkerRatio",
                                      f"declared clinkerRatio {ratio} differs from the value derived "
                                      f"from the constituents ({derived:.1f})"))
+
+    # Pilot convention: the passport URI must point to this batch (last path segment = batchID).
+    if isinstance(record, dict):
+        batch, uri = record.get("batchID"), record.get("passportURI")
+        if isinstance(batch, str) and batch and isinstance(uri, str) and "://" in uri:
+            last = urlparse(uri).path.rstrip("/").rsplit("/", 1)[-1]
+            if last != batch:
+                problems.append(("passportURI",
+                                 f"passport URI ends with '{last}', not with the batchID '{batch}'"))
 
     lca = record.get("lcaIndicators") if isinstance(record, dict) else None
     entries = lca.get("indicatorsPerModule") if isinstance(lca, dict) else None

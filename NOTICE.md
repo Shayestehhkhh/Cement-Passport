@@ -4,7 +4,7 @@ This package (Digital Cement Passport – illustrative pilot implementation) is 
 of the modelling approach of:
 
 * **Battery Pass data model** – Battery Pass consortium, https://github.com/batterypass/BatteryPassDataModel,
-  release 1.2.0. The repository README states that the work is made available under the Creative Commons
+  releases 1.0.0 (AsyncAPI/MQTT files) and 1.2.0. The repository README states that the work is made available under the Creative Commons
   Attribution 4.0 International license (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/.
   Some model files in that repository still carry an older CC BY-NC 4.0 header; no files or text from the
   repository are included in this package.

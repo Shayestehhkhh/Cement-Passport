@@ -61,7 +61,7 @@ components:
           indicators:
             type: object
             additionalProperties: false
-            required: [gwpTotal]
+            required: [gwpTotal, primaryEnergyRenewableTotal, primaryEnergyNonRenewableTotal, dataSource, lastUpdated]
             properties:
               gwpTotal:
                 type: number
@@ -75,7 +75,8 @@ components:
                 minimum: 0
                 description: PENRT, MJ per declared unit (EN 15804+A2).
               dataSource:
-                enum: [EPD, supplyChainReport, IoT/MQTT, siteInspection]
+                enum: [EPD, supplyChainReport, plantSensor, siteInspection]
+                description: Origin of the values; the transport protocol (MQTT) is not a data source.
               lastUpdated:
                 type: string
                 format: date-time
@@ -89,5 +90,5 @@ components:
               gwpTotal: 41.5
               primaryEnergyRenewableTotal: 31.0
               primaryEnergyNonRenewableTotal: 462.0
-              dataSource: IoT/MQTT
+              dataSource: plantSensor
               lastUpdated: '2026-03-03T06:00:00Z'

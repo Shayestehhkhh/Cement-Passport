@@ -27,6 +27,11 @@ from validate_passport import validate_record  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 E = html.escape
 
+
+def _g(value):
+    """Number without trailing zeros, or a dash when the indicator is not declared."""
+    return "–" if value is None else f"{value:g}"
+
 STYLE = """
 /* Layout: a cement-bag label at the top, then role-marked sections in one column (max 760px). */
 :root{
@@ -86,8 +91,9 @@ td.n,th.n{text-align:right}
 tr:last-child td{border-bottom:0}
 .bars{display:flex;flex-direction:column;gap:8px;padding:14px 0}
 .brow{display:grid;grid-template-columns:52px minmax(0,1fr) 64px;align-items:center;gap:10px;font-size:14px}
-.brow .t{height:16px;background:var(--bar3);border-radius:3px;overflow:hidden}
-.brow .t i{display:block;height:100%;background:var(--bar)}
+.brow .t{position:relative;height:16px;background:var(--bar3);border-radius:3px;overflow:hidden}
+.brow .t i{position:absolute;top:0;bottom:0;background:var(--bar)}
+.brow .t s{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--muted)}
 .brow .val{text-align:right;font-variant-numeric:tabular-nums}
 .brow b{font-family:var(--f-mono);font-weight:600}
 .qrbox{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px}
@@ -121,6 +127,9 @@ def page_body(record, qr_url=None):
     unit = lca["declaredUnit"]
     entries = lca["indicatorsPerModule"]
     gwp = a1_a3_total(entries)
+    gwp_html = (f'<span class="v">{gwp:g}<span> kg CO₂e</span></span><span class="s" style="color:var(--muted)">per {E(unit)}</span>'
+                if gwp is not None else
+                '<span class="v">–</span><span class="s" style="color:var(--muted)">Not available (A1, A2 and A3 not all declared)</span>')
     early = st.get("earlyStrength")
     cr = s["solubleChromiumVI"]
 
@@ -135,13 +144,22 @@ def page_body(record, qr_url=None):
         f'<tr><td>{E(x["name"])}</td><td>{E(x["role"])}</td><td class="mono">{E(x["casNumber"])}</td>'
         f'<td class="n">{x["massPercent"]:g}</td></tr>' for x in c["constituents"])
     vmax = max(abs(e["gwpTotal"]) for e in entries) or 1
+    has_negative = any(e["gwpTotal"] < 0 for e in entries)
+
+    def bar(value):
+        """Bar from a zero line: at the left edge, or in the middle when any value is negative."""
+        if not has_negative:
+            return f'<i style="left:0;width:{100 * value / vmax:.1f}%"></i>'
+        width = 50 * abs(value) / vmax
+        left = 50 - width if value < 0 else 50
+        return f'<i style="left:{left:.1f}%;width:{width:.1f}%"></i><s></s>'
     bars = "".join(
-        f'<div class="brow"><b>{E(e["module"])}</b><div class="t"><i style="width:{100 * abs(e["gwpTotal"]) / vmax:.1f}%"></i></div>'
+        f'<div class="brow"><b>{E(e["module"])}</b><div class="t">{bar(e["gwpTotal"])}</div>'
         f'<span class="val">{e["gwpTotal"]:g}</span></div>' for e in entries)
     mod_rows = "".join(
         f'<tr><td class="mono">{E(e["module"])}</td><td class="n">{e["gwpTotal"]:g}</td>'
-        f'<td class="n">{e.get("primaryEnergyRenewableTotal", "–")}</td>'
-        f'<td class="n">{e.get("primaryEnergyNonRenewableTotal", "–")}</td><td>{E(e.get("dataSource", "–"))}</td></tr>'
+        f'<td class="n">{_g(e.get("primaryEnergyRenewableTotal"))}</td>'
+        f'<td class="n">{_g(e.get("primaryEnergyNonRenewableTotal"))}</td><td>{E(e.get("dataSource", "–"))}</td></tr>'
         for e in entries)
     q = t.get("quarryLocation")
     qr_content = qr_url or summary_text(record)
@@ -149,7 +167,6 @@ def page_body(record, qr_url=None):
                "Scan with a phone camera: the QR holds a short text summary of this batch and works offline.")
 
     return f"""<title>Cement Passport {E(record['batchID'])}</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@500;600&family=Source+Sans+3:wght@400;600;700&display=swap">
 <style>{STYLE}</style>
@@ -165,8 +182,8 @@ def page_body(record, qr_url=None):
     <div class="fig"><span class="k">Clinker</span><span class="v">{c['clinkerRatio']:g}<span> %</span></span></div>
     <div class="fig"><span class="k">28-day strength</span><span class="v">{st['standardStrength28Days']:g}<span> MPa</span></span></div>
     <div class="fig"><span class="k">Soluble Cr(VI)</span><span class="v">{cr:g}<span> / 2 mg/kg</span></span>
-      <div class="meter" aria-hidden="true"><i style="width:{min(100, 50 * cr):.0f}%"></i></div><span class="s">Below the REACH limit</span></div>
-    <div class="fig"><span class="k">GWP A1–A3</span><span class="v">{gwp:g}<span> kg CO₂e</span></span><span class="s" style="color:var(--muted)">per {E(unit)}</span></div>
+      <div class="meter" aria-hidden="true"><i style="width:{min(100, 50 * cr):.0f}%"></i></div><span class="s">At or below the REACH limit</span></div>
+    <div class="fig"><span class="k">GWP A1–A3</span>{gwp_html}</div>
   </div>
 </article>
 
@@ -219,9 +236,11 @@ def render(record, out_dir=ROOT / "output", qr_url=None):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     body = page_body(record, qr_url)
+    # title, font links and styles belong in <head>; the visible content starts at <main>
+    head_part, main_part = body.split("<main", 1)
     doc = ('<!doctype html>\n<html lang="en"><head><meta charset="utf-8">'
-           '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
-           f'</head><body>\n{body}</body></html>\n')
+           '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
+           f'{head_part}</head><body>\n<main{main_part}</body></html>\n')
     target = out_dir / f"passport_{record['batchID']}.html"
     target.write_text(doc, encoding="utf-8")
     return target

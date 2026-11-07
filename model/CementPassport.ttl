@@ -4,7 +4,7 @@
 #
 # Pilot artefact accompanying a conceptual study. The structure follows the
 # modelling pattern of the Battery Pass data model (Battery Pass consortium,
-# https://github.com/batterypass/BatteryPassDataModel, release 1.2.0, CC BY 4.0),
+# https://github.com/batterypass/BatteryPassDataModel, releases 1.0.0 and 1.2.0),
 # adapted to cement. No text or elements were copied from that repository.
 #
 # License: CC BY 4.0 (see LICENSE)
@@ -33,7 +33,7 @@
    samm:exampleValue "DCP-EX-2026-000123" .
 
 :passportURI a samm:Property ;
-   samm:description "Resolvable URI of the batch passport; content of the QR data carrier."@en ;
+   samm:description "Resolvable URI of the batch passport; content of the QR data carrier. In this pilot its last path segment equals the batchID."@en ;
    samm:characteristic samm-c:ResourcePath .
 
 # ------------------------------------------------------------ Traceability
@@ -144,7 +144,15 @@
    samm:dataType :Constituent .
 
 :Constituent a samm:Entity ;
-   samm:properties ( :name :role :casNumber :massPercent ) .
+   samm:properties ( :name :role [ samm:property :en197Constituent ; samm:optional true ] :casNumber :massPercent ) .
+
+:en197Constituent a samm:Property ;
+   samm:description "Constituent notation of EN 197-1 (Table 1): K clinker, S blast-furnace slag, D silica fume, P natural pozzolana, Q natural calcined pozzolana, V siliceous fly ash, W calcareous fly ash, T burnt shale, L and LL limestone. Required for clinker, main and minor additional constituents."@en ;
+   samm:characteristic :En197ConstituentEnumeration .
+
+:En197ConstituentEnumeration a samm-c:Enumeration ;
+   samm:dataType xsd:string ;
+   samm-c:values ( "K" "S" "D" "P" "Q" "V" "W" "T" "L" "LL" ) .
 
 :name a samm:Property ;
    samm:characteristic samm-c:Text .
@@ -176,9 +184,10 @@
    samm:dataType :Strength .
 
 :Strength a samm:Entity ;
-   samm:properties ( [ samm:property :earlyStrength ; samm:optional true ] :standardStrength28Days ) .
+   samm:properties ( :earlyStrength :standardStrength28Days ) .
 
 :earlyStrength a samm:Property ;
+   samm:description "Early compressive strength at the age specified for the strength class (2 or 7 days, EN 197-1, Table 3)."@en ;
    samm:characteristic :EarlyStrengthCharacteristic .
 
 :EarlyStrengthCharacteristic a samm-c:SingleEntity ;
@@ -250,8 +259,12 @@
    samm:properties ( :declaredUnit :indicatorsPerModule ) .
 
 :declaredUnit a samm:Property ;
-   samm:characteristic samm-c:Text ;
-   samm:exampleValue "1 t cement" .
+   samm:description "Declared unit, fixed to 1 t of cement in this pilot."@en ;
+   samm:characteristic :DeclaredUnitEnumeration .
+
+:DeclaredUnitEnumeration a samm-c:Enumeration ;
+   samm:dataType xsd:string ;
+   samm-c:values ( "1 t cement" ) .
 
 :indicatorsPerModule a samm:Property ;
    samm:description "Indicators per EN 15804 information module; pattern analogous to the carbon footprint per lifecycle stage of the Battery Pass data model."@en ;
@@ -263,8 +276,8 @@
 :ModuleIndicators a samm:Entity ;
    samm:properties ( :module
                      :gwpTotal
-                     [ samm:property :primaryEnergyRenewableTotal ; samm:optional true ]
-                     [ samm:property :primaryEnergyNonRenewableTotal ; samm:optional true ]
+                     :primaryEnergyRenewableTotal
+                     :primaryEnergyNonRenewableTotal
                      [ samm:property :dataSource ; samm:optional true ]
                      [ samm:property :lastUpdated ; samm:optional true ] ) .
 
@@ -304,7 +317,7 @@
 
 :DataSourceEnumeration a samm-c:Enumeration ;
    samm:dataType xsd:string ;
-   samm-c:values ( "EPD" "supplyChainReport" "IoT/MQTT" "siteInspection" ) .
+   samm-c:values ( "EPD" "supplyChainReport" "plantSensor" "siteInspection" ) .
 
 :lastUpdated a samm:Property ;
    samm:characteristic samm-c:Timestamp .

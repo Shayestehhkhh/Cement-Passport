@@ -19,12 +19,14 @@
       {
         "name": "Portland cement clinker",
         "role": "clinker",
+        "en197Constituent": "K",
         "casNumber": "65997-16-2",
         "massPercent": 70.3
       },
       {
         "name": "Siliceous fly ash",
         "role": "mainConstituent",
+        "en197Constituent": "V",
         "casNumber": "68131-74-8",
         "massPercent": 24.7
       },
@@ -69,28 +71,36 @@
         "gwpTotal": 41.5,
         "primaryEnergyRenewableTotal": 31.0,
         "primaryEnergyNonRenewableTotal": 462.0,
-        "dataSource": "IoT/MQTT",
+        "dataSource": "plantSensor",
         "lastUpdated": "2026-03-03T06:00:00Z",
         "module": "A3"
       },
       {
         "module": "C1",
         "gwpTotal": 1.0,
+        "primaryEnergyRenewableTotal": 1.0,
+        "primaryEnergyNonRenewableTotal": 15.0,
         "dataSource": "EPD"
       },
       {
         "module": "C2",
         "gwpTotal": 3.0,
+        "primaryEnergyRenewableTotal": 0.5,
+        "primaryEnergyNonRenewableTotal": 40.0,
         "dataSource": "EPD"
       },
       {
         "module": "C3",
         "gwpTotal": 2.0,
+        "primaryEnergyRenewableTotal": 1.0,
+        "primaryEnergyNonRenewableTotal": 20.0,
         "dataSource": "EPD"
       },
       {
         "module": "C4",
         "gwpTotal": 1.5,
+        "primaryEnergyRenewableTotal": 0.2,
+        "primaryEnergyNonRenewableTotal": 10.0,
         "dataSource": "EPD"
       }
     ]
