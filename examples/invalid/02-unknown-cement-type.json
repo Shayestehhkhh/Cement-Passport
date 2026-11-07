@@ -1,0 +1,102 @@
+{
+  "batchID": "DCP-EX-2026-000123",
+  "passportURI": "https://example.org/dcp/passport/DCP-EX-2026-000123",
+  "traceability": {
+    "manufacturerID": "MFR-EXAMPLE-0001",
+    "plantLocation": "Example Cement Plant (fictitious)",
+    "productSKU": "SKU-EX-CEMIIBV-42.5N",
+    "manufacturingDate": "2026-03-02",
+    "quarryLocation": {
+      "latitude": 0.0,
+      "longitude": 0.0
+    }
+  },
+  "composition": {
+    "cementType": "CEM II/C-V",
+    "strengthClass": "42.5N",
+    "clinkerRatio": 74.0,
+    "constituents": [
+      {
+        "name": "Portland cement clinker",
+        "role": "clinker",
+        "casNumber": "65997-16-2",
+        "massPercent": 70.3
+      },
+      {
+        "name": "Siliceous fly ash",
+        "role": "mainConstituent",
+        "casNumber": "68131-74-8",
+        "massPercent": 24.7
+      },
+      {
+        "name": "Gypsum",
+        "role": "calciumSulfate",
+        "casNumber": "13397-24-5",
+        "massPercent": 5.0
+      }
+    ]
+  },
+  "strength": {
+    "earlyStrength": {
+      "ageDays": 2,
+      "value": 18.0
+    },
+    "standardStrength28Days": 48.0
+  },
+  "safety": {
+    "solubleChromiumVI": 1.2,
+    "safetyDataSheet": "https://example.org/dcp/docs/sds-example.pdf"
+  },
+  "energySourceType": "Mixed",
+  "lcaIndicators": {
+    "declaredUnit": "1 t cement",
+    "indicatorsPerModule": [
+      {
+        "module": "A1",
+        "gwpTotal": 560.0,
+        "primaryEnergyRenewableTotal": 120.0,
+        "primaryEnergyNonRenewableTotal": 2100.0,
+        "dataSource": "EPD"
+      },
+      {
+        "module": "A2",
+        "gwpTotal": 12.0,
+        "primaryEnergyRenewableTotal": 2.0,
+        "primaryEnergyNonRenewableTotal": 160.0,
+        "dataSource": "supplyChainReport"
+      },
+      {
+        "module": "A3",
+        "gwpTotal": 40.0,
+        "primaryEnergyRenewableTotal": 30.0,
+        "primaryEnergyNonRenewableTotal": 450.0,
+        "dataSource": "IoT/MQTT",
+        "lastUpdated": "2026-03-02T18:00:00Z"
+      },
+      {
+        "module": "C1",
+        "gwpTotal": 1.0,
+        "dataSource": "EPD"
+      },
+      {
+        "module": "C2",
+        "gwpTotal": 3.0,
+        "dataSource": "EPD"
+      },
+      {
+        "module": "C3",
+        "gwpTotal": 2.0,
+        "dataSource": "EPD"
+      },
+      {
+        "module": "C4",
+        "gwpTotal": 1.5,
+        "dataSource": "EPD"
+      }
+    ]
+  },
+  "endOfLife": {
+    "recyclabilityStatus": "Not yet assessed",
+    "deconstructionInformationURI": "https://example.org/dcp/docs/deconstruction-example.pdf"
+  }
+}

@@ -1,0 +1,327 @@
+#######################################################################
+# Digital Cement Passport (DCP) - illustrative semantic aspect model
+# Semantic Aspect Meta Model (SAMM) 2.1.0, Turtle serialization.
+#
+# Pilot artefact accompanying a conceptual study. The structure follows the
+# modelling pattern of the Battery Pass data model (Battery Pass consortium,
+# https://github.com/batterypass/BatteryPassDataModel, release 1.2.0, CC BY 4.0),
+# adapted to cement. No text or elements were copied from that repository.
+#
+# License: CC BY 4.0 (see LICENSE)
+#######################################################################
+
+@prefix samm: <urn:samm:org.eclipse.esmf.samm:meta-model:2.1.0#> .
+@prefix samm-c: <urn:samm:org.eclipse.esmf.samm:characteristic:2.1.0#> .
+@prefix unit: <urn:samm:org.eclipse.esmf.samm:unit:2.1.0#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix : <urn:samm:es.us.dcp:1.0.0#> .
+
+# ------------------------------------------------------------------ Aspect
+:CementPassport a samm:Aspect ;
+   samm:preferredName "Digital Cement Passport"@en ;
+   samm:description "Batch-level digital passport for cement: traceability, composition, strength, safety, EN 15804 indicators and end-of-life information. Illustrative model."@en ;
+   samm:properties ( :batchID :passportURI :traceability :composition :strength :safety
+                     [ samm:property :energySourceType ; samm:optional true ]
+                     :lcaIndicators
+                     [ samm:property :endOfLife ; samm:optional true ] ) ;
+   samm:operations ( ) ;
+   samm:events ( ) .
+
+:batchID a samm:Property ;
+   samm:description "Unique, immutable identifier of the cement batch; primary key across all layers."@en ;
+   samm:characteristic samm-c:Text ;
+   samm:exampleValue "DCP-EX-2026-000123" .
+
+:passportURI a samm:Property ;
+   samm:description "Resolvable URI of the batch passport; content of the QR data carrier."@en ;
+   samm:characteristic samm-c:ResourcePath .
+
+# ------------------------------------------------------------ Traceability
+:traceability a samm:Property ;
+   samm:characteristic :TraceabilityCharacteristic .
+
+:TraceabilityCharacteristic a samm-c:SingleEntity ;
+   samm:dataType :Traceability .
+
+:Traceability a samm:Entity ;
+   samm:properties ( :manufacturerID :plantLocation :productSKU :manufacturingDate
+                     [ samm:property :quarryLocation ; samm:optional true ] ) .
+
+:manufacturerID a samm:Property ;
+   samm:characteristic samm-c:Text .
+
+:plantLocation a samm:Property ;
+   samm:characteristic samm-c:Text .
+
+:productSKU a samm:Property ;
+   samm:description "Stock keeping unit of the cement product."@en ;
+   samm:characteristic samm-c:Text .
+
+:manufacturingDate a samm:Property ;
+   samm:characteristic :DateCharacteristic .
+
+:DateCharacteristic a samm:Characteristic ;
+   samm:dataType xsd:date .
+
+:quarryLocation a samm:Property ;
+   samm:description "Geographic coordinates of the quarry of origin (WGS 84)."@en ;
+   samm:characteristic :GeoLocationCharacteristic .
+
+:GeoLocationCharacteristic a samm-c:SingleEntity ;
+   samm:dataType :GeoLocation .
+
+:GeoLocation a samm:Entity ;
+   samm:properties ( :latitude :longitude ) .
+
+:latitude a samm:Property ;
+   samm:characteristic :LatitudeCharacteristic .
+
+:LatitudeCharacteristic a samm-c:Trait ;
+   samm-c:baseCharacteristic :DegreeMeasurement ;
+   samm-c:constraint [ a samm-c:RangeConstraint ;
+                       samm-c:minValue "-90.0"^^xsd:double ; samm-c:maxValue "90.0"^^xsd:double ] .
+
+:longitude a samm:Property ;
+   samm:characteristic :LongitudeCharacteristic .
+
+:LongitudeCharacteristic a samm-c:Trait ;
+   samm-c:baseCharacteristic :DegreeMeasurement ;
+   samm-c:constraint [ a samm-c:RangeConstraint ;
+                       samm-c:minValue "-180.0"^^xsd:double ; samm-c:maxValue "180.0"^^xsd:double ] .
+
+:DegreeMeasurement a samm-c:Measurement ;
+   samm:dataType xsd:double ;
+   samm-c:unit unit:degreeUnitOfAngle .
+
+# ------------------------------------------------------------- Composition
+:composition a samm:Property ;
+   samm:characteristic :CompositionCharacteristic .
+
+:CompositionCharacteristic a samm-c:SingleEntity ;
+   samm:dataType :Composition .
+
+:Composition a samm:Entity ;
+   samm:properties ( :cementType :strengthClass :clinkerRatio :constituents ) .
+
+:cementType a samm:Property ;
+   samm:description "Product notation of the common cement (EN 197-1, Table 1)."@en ;
+   samm:characteristic :CementTypeEnumeration .
+
+:CementTypeEnumeration a samm-c:Enumeration ;
+   samm:dataType xsd:string ;
+   samm-c:values ( "CEM I"
+                   "CEM II/A-S" "CEM II/B-S" "CEM II/A-D" "CEM II/A-P" "CEM II/B-P"
+                   "CEM II/A-Q" "CEM II/B-Q" "CEM II/A-V" "CEM II/B-V" "CEM II/A-W" "CEM II/B-W"
+                   "CEM II/A-T" "CEM II/B-T" "CEM II/A-L" "CEM II/B-L" "CEM II/A-LL" "CEM II/B-LL"
+                   "CEM II/A-M" "CEM II/B-M"
+                   "CEM III/A" "CEM III/B" "CEM III/C" "CEM IV/A" "CEM IV/B" "CEM V/A" "CEM V/B" ) .
+
+:strengthClass a samm:Property ;
+   samm:description "Strength class (EN 197-1, Table 3)."@en ;
+   samm:characteristic :StrengthClassEnumeration .
+
+:StrengthClassEnumeration a samm-c:Enumeration ;
+   samm:dataType xsd:string ;
+   samm-c:values ( "32.5L" "32.5N" "32.5R" "42.5L" "42.5N" "42.5R" "52.5L" "52.5N" "52.5R" ) .
+
+:clinkerRatio a samm:Property ;
+   samm:description "Clinker content in % by mass of the sum of main and minor additional constituents (EN 197-1)."@en ;
+   samm:characteristic :PercentageCharacteristic .
+
+:PercentageCharacteristic a samm-c:Trait ;
+   samm-c:baseCharacteristic :PercentMeasurement ;
+   samm-c:constraint [ a samm-c:RangeConstraint ;
+                       samm-c:minValue "0.0"^^xsd:double ; samm-c:maxValue "100.0"^^xsd:double ] .
+
+:PercentMeasurement a samm-c:Measurement ;
+   samm:dataType xsd:double ;
+   samm-c:unit unit:percent .
+
+:constituents a samm:Property ;
+   samm:characteristic :ConstituentList .
+
+:ConstituentList a samm-c:List ;
+   samm:dataType :Constituent .
+
+:Constituent a samm:Entity ;
+   samm:properties ( :name :role :casNumber :massPercent ) .
+
+:name a samm:Property ;
+   samm:characteristic samm-c:Text .
+
+:role a samm:Property ;
+   samm:characteristic :ConstituentRoleEnumeration .
+
+:ConstituentRoleEnumeration a samm-c:Enumeration ;
+   samm:dataType xsd:string ;
+   samm-c:values ( "clinker" "mainConstituent" "minorAdditionalConstituent" "calciumSulfate" "additive" ) .
+
+:casNumber a samm:Property ;
+   samm:description "Chemical Abstracts Service (CAS) Registry Number."@en ;
+   samm:characteristic :CasNumberCharacteristic .
+
+:CasNumberCharacteristic a samm-c:Trait ;
+   samm-c:baseCharacteristic samm-c:Text ;
+   samm-c:constraint [ a samm-c:RegularExpressionConstraint ; samm:value "^\\d{2,7}-\\d{2}-\\d$" ] .
+
+:massPercent a samm:Property ;
+   samm:description "Share of the constituent in % by mass of the cement."@en ;
+   samm:characteristic :PercentageCharacteristic .
+
+# ---------------------------------------------------------------- Strength
+:strength a samm:Property ;
+   samm:characteristic :StrengthCharacteristic .
+
+:StrengthCharacteristic a samm-c:SingleEntity ;
+   samm:dataType :Strength .
+
+:Strength a samm:Entity ;
+   samm:properties ( [ samm:property :earlyStrength ; samm:optional true ] :standardStrength28Days ) .
+
+:earlyStrength a samm:Property ;
+   samm:characteristic :EarlyStrengthCharacteristic .
+
+:EarlyStrengthCharacteristic a samm-c:SingleEntity ;
+   samm:dataType :EarlyStrength .
+
+:EarlyStrength a samm:Entity ;
+   samm:properties ( :ageDays [ samm:property :strengthValue ; samm:payloadName "value" ] ) .
+
+:ageDays a samm:Property ;
+   samm:characteristic :AgeDaysEnumeration .
+
+:AgeDaysEnumeration a samm-c:Enumeration ;
+   samm:dataType xsd:int ;
+   samm-c:values ( "2"^^xsd:int "7"^^xsd:int ) .
+
+:strengthValue a samm:Property ;
+   samm:characteristic :StrengthMeasurement .
+
+:standardStrength28Days a samm:Property ;
+   samm:description "Standard (28-day) compressive strength."@en ;
+   samm:characteristic :StrengthMeasurement .
+
+:StrengthMeasurement a samm-c:Measurement ;
+   samm:dataType xsd:double ;
+   samm-c:unit unit:megapascal .
+
+# ------------------------------------------------------------------ Safety
+:safety a samm:Property ;
+   samm:characteristic :SafetyCharacteristic .
+
+:SafetyCharacteristic a samm-c:SingleEntity ;
+   samm:dataType :Safety .
+
+:Safety a samm:Entity ;
+   samm:properties ( :solubleChromiumVI [ samm:property :safetyDataSheet ; samm:optional true ] ) .
+
+:solubleChromiumVI a samm:Property ;
+   samm:description "Water-soluble chromium VI per total dry weight of cement; limit 2 mg/kg (0.0002 %) under REACH Annex XVII, entry 47."@en ;
+   samm:characteristic :ChromiumVICharacteristic .
+
+:ChromiumVICharacteristic a samm-c:Trait ;
+   samm-c:baseCharacteristic :ChromiumVIMeasurement ;
+   samm-c:constraint [ a samm-c:RangeConstraint ;
+                       samm-c:minValue "0.0"^^xsd:double ; samm-c:maxValue "2.0"^^xsd:double ] .
+
+:ChromiumVIMeasurement a samm-c:Measurement ;
+   samm:dataType xsd:double ;
+   samm-c:unit unit:milligramPerKilogram .
+
+:safetyDataSheet a samm:Property ;
+   samm:characteristic samm-c:ResourcePath .
+
+# ---------------------------------------------------------- Energy source
+:energySourceType a samm:Property ;
+   samm:characteristic :EnergySourceEnumeration .
+
+:EnergySourceEnumeration a samm-c:Enumeration ;
+   samm:dataType xsd:string ;
+   samm-c:values ( "Fossil" "Alternative" "Renewable" "Mixed" ) .
+
+# ------------------------------------------------- EN 15804 LCA indicators
+:lcaIndicators a samm:Property ;
+   samm:characteristic :LcaIndicatorsCharacteristic .
+
+:LcaIndicatorsCharacteristic a samm-c:SingleEntity ;
+   samm:dataType :LcaIndicators .
+
+:LcaIndicators a samm:Entity ;
+   samm:properties ( :declaredUnit :indicatorsPerModule ) .
+
+:declaredUnit a samm:Property ;
+   samm:characteristic samm-c:Text ;
+   samm:exampleValue "1 t cement" .
+
+:indicatorsPerModule a samm:Property ;
+   samm:description "Indicators per EN 15804 information module; pattern analogous to the carbon footprint per lifecycle stage of the Battery Pass data model."@en ;
+   samm:characteristic :ModuleIndicatorsList .
+
+:ModuleIndicatorsList a samm-c:List ;
+   samm:dataType :ModuleIndicators .
+
+:ModuleIndicators a samm:Entity ;
+   samm:properties ( :module
+                     :gwpTotal
+                     [ samm:property :primaryEnergyRenewableTotal ; samm:optional true ]
+                     [ samm:property :primaryEnergyNonRenewableTotal ; samm:optional true ]
+                     [ samm:property :dataSource ; samm:optional true ]
+                     [ samm:property :lastUpdated ; samm:optional true ] ) .
+
+:module a samm:Property ;
+   samm:characteristic :ModuleEnumeration .
+
+:ModuleEnumeration a samm-c:Enumeration ;
+   samm:dataType xsd:string ;
+   samm-c:values ( "A1" "A2" "A3" "A1-A3" "C1" "C2" "C3" "C4" ) .
+
+:gwpTotal a samm:Property ;
+   samm:description "GWP-total, kg CO2 eq per declared unit (EN 15804+A2)."@en ;
+   samm:characteristic :GwpMeasurement .
+
+:GwpMeasurement a samm-c:Measurement ;
+   samm:dataType xsd:double ;
+   samm-c:unit :kilogramCO2Equivalent .
+
+:kilogramCO2Equivalent a samm:Unit ;
+   samm:preferredName "kilogram CO2 equivalent"@en ;
+   samm:symbol "kg CO2 eq" .
+
+:primaryEnergyRenewableTotal a samm:Property ;
+   samm:description "PERT, total use of renewable primary energy resources, per declared unit (EN 15804+A2)."@en ;
+   samm:characteristic :EnergyMeasurement .
+
+:primaryEnergyNonRenewableTotal a samm:Property ;
+   samm:description "PENRT, total use of non-renewable primary energy resources, per declared unit (EN 15804+A2)."@en ;
+   samm:characteristic :EnergyMeasurement .
+
+:EnergyMeasurement a samm-c:Measurement ;
+   samm:dataType xsd:double ;
+   samm-c:unit unit:megajoule .
+
+:dataSource a samm:Property ;
+   samm:characteristic :DataSourceEnumeration .
+
+:DataSourceEnumeration a samm-c:Enumeration ;
+   samm:dataType xsd:string ;
+   samm-c:values ( "EPD" "supplyChainReport" "IoT/MQTT" "siteInspection" ) .
+
+:lastUpdated a samm:Property ;
+   samm:characteristic samm-c:Timestamp .
+
+# ------------------------------------------------------------- End of life
+:endOfLife a samm:Property ;
+   samm:characteristic :EndOfLifeCharacteristic .
+
+:EndOfLifeCharacteristic a samm-c:SingleEntity ;
+   samm:dataType :EndOfLife .
+
+:EndOfLife a samm:Entity ;
+   samm:properties ( [ samm:property :recyclabilityStatus ; samm:optional true ]
+                     [ samm:property :deconstructionInformationURI ; samm:optional true ] ) .
+
+:recyclabilityStatus a samm:Property ;
+   samm:characteristic samm-c:Text .
+
+:deconstructionInformationURI a samm:Property ;
+   samm:characteristic samm-c:ResourcePath .

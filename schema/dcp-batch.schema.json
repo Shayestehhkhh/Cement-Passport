@@ -1,0 +1,1252 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.org/dcp/schema/dcp-batch.schema.json",
+  "title": "Digital Cement Passport (DCP) - batch record",
+  "description": "Illustrative JSON Schema of the Digital Cement Passport framework. Pilot artefact for demonstration only; not a conformity-assessment or regulatory-compliance tool.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "batchID",
+    "passportURI",
+    "traceability",
+    "composition",
+    "strength",
+    "safety",
+    "lcaIndicators"
+  ],
+  "properties": {
+    "batchID": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique, immutable batch identifier; primary key across all layers."
+    },
+    "passportURI": {
+      "type": "string",
+      "format": "uri",
+      "description": "Resolvable URI of the batch passport; this is the content of the QR data carrier."
+    },
+    "traceability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manufacturerID",
+        "plantLocation",
+        "productSKU",
+        "manufacturingDate"
+      ],
+      "properties": {
+        "manufacturerID": {
+          "type": "string",
+          "minLength": 1
+        },
+        "plantLocation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "productSKU": {
+          "type": "string",
+          "minLength": 1
+        },
+        "manufacturingDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "quarryLocation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "latitude",
+            "longitude"
+          ],
+          "properties": {
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            }
+          }
+        }
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cementType",
+        "strengthClass",
+        "clinkerRatio",
+        "constituents"
+      ],
+      "properties": {
+        "cementType": {
+          "$ref": "#/definitions/cementTypeEN197_1"
+        },
+        "strengthClass": {
+          "$ref": "#/definitions/strengthClassEN197_1"
+        },
+        "clinkerRatio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Clinker, % by mass of the sum of main and minor additional constituents (EN 197-1)."
+        },
+        "constituents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "role",
+              "casNumber",
+              "massPercent"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "enum": [
+                  "clinker",
+                  "mainConstituent",
+                  "minorAdditionalConstituent",
+                  "calciumSulfate",
+                  "additive"
+                ]
+              },
+              "casNumber": {
+                "type": "string",
+                "pattern": "^\\d{2,7}-\\d{2}-\\d$"
+              },
+              "massPercent": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM I"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 95,
+                "maximum": 100
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/A-S"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 80,
+                "maximum": 94
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/B-S"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 65,
+                "maximum": 79
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/A-D"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 90,
+                "maximum": 94
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/A-P"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 80,
+                "maximum": 94
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/B-P"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 65,
+                "maximum": 79
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/A-Q"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 80,
+                "maximum": 94
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/B-Q"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 65,
+                "maximum": 79
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/A-V"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 80,
+                "maximum": 94
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/B-V"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 65,
+                "maximum": 79
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/A-W"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 80,
+                "maximum": 94
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/B-W"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 65,
+                "maximum": 79
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/A-T"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 80,
+                "maximum": 94
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/B-T"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 65,
+                "maximum": 79
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/A-L"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 80,
+                "maximum": 94
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/B-L"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 65,
+                "maximum": 79
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/A-LL"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 80,
+                "maximum": 94
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/B-LL"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 65,
+                "maximum": 79
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/A-M"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 80,
+                "maximum": 88
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM II/B-M"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 65,
+                "maximum": 79
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM III/A"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 35,
+                "maximum": 64
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM III/B"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 20,
+                "maximum": 34
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM III/C"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 5,
+                "maximum": 19
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM IV/A"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 65,
+                "maximum": 89
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM IV/B"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 45,
+                "maximum": 64
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM V/A"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 40,
+                "maximum": 64
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cementType": {
+                "const": "CEM V/B"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "clinkerRatio": {
+                "minimum": 20,
+                "maximum": 38
+              }
+            }
+          }
+        }
+      ]
+    },
+    "strength": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "standardStrength28Days"
+      ],
+      "properties": {
+        "earlyStrength": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ageDays",
+            "value"
+          ],
+          "properties": {
+            "ageDays": {
+              "enum": [
+                2,
+                7
+              ]
+            },
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Early compressive strength in MPa."
+            }
+          }
+        },
+        "standardStrength28Days": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Standard (28-day) compressive strength in MPa."
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "solubleChromiumVI"
+      ],
+      "properties": {
+        "solubleChromiumVI": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2,
+          "description": "Water-soluble chromium VI in mg/kg of the total dry weight of cement; limit 2 mg/kg (0.0002 %) under REACH Annex XVII, entry 47."
+        },
+        "safetyDataSheet": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "energySourceType": {
+      "enum": [
+        "Fossil",
+        "Alternative",
+        "Renewable",
+        "Mixed"
+      ]
+    },
+    "lcaIndicators": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "declaredUnit",
+        "indicatorsPerModule"
+      ],
+      "properties": {
+        "declaredUnit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "indicatorsPerModule": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/moduleIndicators"
+          }
+        }
+      }
+    },
+    "endOfLife": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "recyclabilityStatus": {
+          "type": "string"
+        },
+        "deconstructionInformationURI": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "composition": {
+            "properties": {
+              "strengthClass": {
+                "const": "32.5L"
+              }
+            },
+            "required": [
+              "strengthClass"
+            ]
+          }
+        },
+        "required": [
+          "composition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "strength": {
+            "properties": {
+              "standardStrength28Days": {
+                "minimum": 32.5,
+                "maximum": 52.5
+              },
+              "earlyStrength": {
+                "if": {
+                  "properties": {
+                    "ageDays": {
+                      "const": 7
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "minimum": 12.0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "composition": {
+            "properties": {
+              "strengthClass": {
+                "const": "32.5N"
+              }
+            },
+            "required": [
+              "strengthClass"
+            ]
+          }
+        },
+        "required": [
+          "composition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "strength": {
+            "properties": {
+              "standardStrength28Days": {
+                "minimum": 32.5,
+                "maximum": 52.5
+              },
+              "earlyStrength": {
+                "if": {
+                  "properties": {
+                    "ageDays": {
+                      "const": 7
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "minimum": 16.0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "composition": {
+            "properties": {
+              "strengthClass": {
+                "const": "32.5R"
+              }
+            },
+            "required": [
+              "strengthClass"
+            ]
+          }
+        },
+        "required": [
+          "composition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "strength": {
+            "properties": {
+              "standardStrength28Days": {
+                "minimum": 32.5,
+                "maximum": 52.5
+              },
+              "earlyStrength": {
+                "if": {
+                  "properties": {
+                    "ageDays": {
+                      "const": 2
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "minimum": 10.0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "composition": {
+            "properties": {
+              "strengthClass": {
+                "const": "42.5L"
+              }
+            },
+            "required": [
+              "strengthClass"
+            ]
+          }
+        },
+        "required": [
+          "composition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "strength": {
+            "properties": {
+              "standardStrength28Days": {
+                "minimum": 42.5,
+                "maximum": 62.5
+              },
+              "earlyStrength": {
+                "if": {
+                  "properties": {
+                    "ageDays": {
+                      "const": 7
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "minimum": 16.0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "composition": {
+            "properties": {
+              "strengthClass": {
+                "const": "42.5N"
+              }
+            },
+            "required": [
+              "strengthClass"
+            ]
+          }
+        },
+        "required": [
+          "composition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "strength": {
+            "properties": {
+              "standardStrength28Days": {
+                "minimum": 42.5,
+                "maximum": 62.5
+              },
+              "earlyStrength": {
+                "if": {
+                  "properties": {
+                    "ageDays": {
+                      "const": 2
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "minimum": 10.0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "composition": {
+            "properties": {
+              "strengthClass": {
+                "const": "42.5R"
+              }
+            },
+            "required": [
+              "strengthClass"
+            ]
+          }
+        },
+        "required": [
+          "composition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "strength": {
+            "properties": {
+              "standardStrength28Days": {
+                "minimum": 42.5,
+                "maximum": 62.5
+              },
+              "earlyStrength": {
+                "if": {
+                  "properties": {
+                    "ageDays": {
+                      "const": 2
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "minimum": 20.0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "composition": {
+            "properties": {
+              "strengthClass": {
+                "const": "52.5L"
+              }
+            },
+            "required": [
+              "strengthClass"
+            ]
+          }
+        },
+        "required": [
+          "composition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "strength": {
+            "properties": {
+              "standardStrength28Days": {
+                "minimum": 52.5
+              },
+              "earlyStrength": {
+                "if": {
+                  "properties": {
+                    "ageDays": {
+                      "const": 2
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "minimum": 10.0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "composition": {
+            "properties": {
+              "strengthClass": {
+                "const": "52.5N"
+              }
+            },
+            "required": [
+              "strengthClass"
+            ]
+          }
+        },
+        "required": [
+          "composition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "strength": {
+            "properties": {
+              "standardStrength28Days": {
+                "minimum": 52.5
+              },
+              "earlyStrength": {
+                "if": {
+                  "properties": {
+                    "ageDays": {
+                      "const": 2
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "minimum": 20.0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "composition": {
+            "properties": {
+              "strengthClass": {
+                "const": "52.5R"
+              }
+            },
+            "required": [
+              "strengthClass"
+            ]
+          }
+        },
+        "required": [
+          "composition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "strength": {
+            "properties": {
+              "standardStrength28Days": {
+                "minimum": 52.5
+              },
+              "earlyStrength": {
+                "if": {
+                  "properties": {
+                    "ageDays": {
+                      "const": 2
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "minimum": 30.0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "composition": {
+            "properties": {
+              "strengthClass": {
+                "enum": [
+                  "32.5L",
+                  "42.5L",
+                  "52.5L"
+                ]
+              }
+            },
+            "required": [
+              "strengthClass"
+            ]
+          }
+        },
+        "required": [
+          "composition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "composition": {
+            "properties": {
+              "cementType": {
+                "enum": [
+                  "CEM III/A",
+                  "CEM III/B",
+                  "CEM III/C"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "cementTypeEN197_1": {
+      "description": "The 27 products of the family of common cements, EN 197-1 Table 1.",
+      "enum": [
+        "CEM I",
+        "CEM II/A-S",
+        "CEM II/B-S",
+        "CEM II/A-D",
+        "CEM II/A-P",
+        "CEM II/B-P",
+        "CEM II/A-Q",
+        "CEM II/B-Q",
+        "CEM II/A-V",
+        "CEM II/B-V",
+        "CEM II/A-W",
+        "CEM II/B-W",
+        "CEM II/A-T",
+        "CEM II/B-T",
+        "CEM II/A-L",
+        "CEM II/B-L",
+        "CEM II/A-LL",
+        "CEM II/B-LL",
+        "CEM II/A-M",
+        "CEM II/B-M",
+        "CEM III/A",
+        "CEM III/B",
+        "CEM III/C",
+        "CEM IV/A",
+        "CEM IV/B",
+        "CEM V/A",
+        "CEM V/B"
+      ]
+    },
+    "strengthClassEN197_1": {
+      "description": "Strength classes, EN 197-1 Table 3 (L classes apply to CEM III only).",
+      "enum": [
+        "32.5L",
+        "32.5N",
+        "32.5R",
+        "42.5L",
+        "42.5N",
+        "42.5R",
+        "52.5L",
+        "52.5N",
+        "52.5R"
+      ]
+    },
+    "moduleIndicators": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module",
+        "gwpTotal"
+      ],
+      "properties": {
+        "module": {
+          "enum": [
+            "A1",
+            "A2",
+            "A3",
+            "A1-A3",
+            "C1",
+            "C2",
+            "C3",
+            "C4"
+          ],
+          "description": "EN 15804 information module covered by the passport (production stage and end-of-life stage)."
+        },
+        "gwpTotal": {
+          "type": "number",
+          "description": "GWP-total (climate change - total), kg CO2 eq per declared unit (EN 15804+A2)."
+        },
+        "primaryEnergyRenewableTotal": {
+          "type": "number",
+          "minimum": 0,
+          "description": "PERT (total use of renewable primary energy resources), MJ per declared unit (EN 15804+A2)."
+        },
+        "primaryEnergyNonRenewableTotal": {
+          "type": "number",
+          "minimum": 0,
+          "description": "PENRT (total use of non-renewable primary energy resources), MJ per declared unit (EN 15804+A2)."
+        },
+        "dataSource": {
+          "enum": [
+            "EPD",
+            "supplyChainReport",
+            "IoT/MQTT",
+            "siteInspection"
+          ]
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,93 @@
+asyncapi: 3.0.0
+info:
+  title: Digital Cement Passport - A3 manufacturing update (illustrative)
+  version: 1.0.0
+  description: |
+    Specification sketch of the proposed MQTT-based component of the DCP framework.
+    Plant gateways publish manufacturing-stage (EN 15804 module A3) indicators for a
+    cement batch; the passport service validates each message against the DCP JSON
+    Schema before recording it. Illustrative only: no broker is operated, and the
+    host below is a reserved example domain.
+  license:
+    name: CC BY 4.0
+    url: https://creativecommons.org/licenses/by/4.0/
+defaultContentType: application/json
+servers:
+  exampleBroker:
+    host: broker.example.org:8883
+    protocol: mqtt
+    description: Placeholder broker (reserved example domain).
+channels:
+  a3Updates:
+    address: dcp/batches/{batchID}/a3
+    description: Manufacturing-stage (A3) indicator updates for one cement batch.
+    parameters:
+      batchID:
+        description: Batch identifier; must equal the batchID inside the message.
+    messages:
+      a3Update:
+        $ref: '#/components/messages/a3Update'
+operations:
+  publishA3Update:
+    action: send
+    summary: A plant gateway publishes A3 indicators for a batch.
+    channel:
+      $ref: '#/channels/a3Updates'
+    messages:
+      - $ref: '#/channels/a3Updates/messages/a3Update'
+  receiveA3Update:
+    action: receive
+    summary: The passport service receives, validates and records A3 indicators.
+    channel:
+      $ref: '#/channels/a3Updates'
+    messages:
+      - $ref: '#/channels/a3Updates/messages/a3Update'
+components:
+  messages:
+    a3Update:
+      name: a3Update
+      title: A3 indicator update
+      contentType: application/json
+      payload:
+        type: object
+        additionalProperties: false
+        required: [batchID, module, indicators]
+        properties:
+          batchID:
+            type: string
+            minLength: 1
+          module:
+            const: A3
+          indicators:
+            type: object
+            additionalProperties: false
+            required: [gwpTotal]
+            properties:
+              gwpTotal:
+                type: number
+                description: GWP-total, kg CO2 eq per declared unit (EN 15804+A2).
+              primaryEnergyRenewableTotal:
+                type: number
+                minimum: 0
+                description: PERT, MJ per declared unit (EN 15804+A2).
+              primaryEnergyNonRenewableTotal:
+                type: number
+                minimum: 0
+                description: PENRT, MJ per declared unit (EN 15804+A2).
+              dataSource:
+                enum: [EPD, supplyChainReport, IoT/MQTT, siteInspection]
+              lastUpdated:
+                type: string
+                format: date-time
+      examples:
+        - name: syntheticA3Update
+          summary: Synthetic example (not measured data).
+          payload:
+            batchID: DCP-EX-2026-000123
+            module: A3
+            indicators:
+              gwpTotal: 41.5
+              primaryEnergyRenewableTotal: 31.0
+              primaryEnergyNonRenewableTotal: 462.0
+              dataSource: IoT/MQTT
+              lastUpdated: '2026-03-03T06:00:00Z'

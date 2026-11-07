@@ -1,0 +1,75 @@
+DCP illustrative pilot - SYNTHETIC DATA ONLY
+Python 3.13.18, jsonschema 4.26.0, qrcode 8.2
+========================================================================
+
+[1] Schema validation
+  ACCEPTED  examples/batch-valid.json
+  REJECTED  invalid/01-chromium-vi-above-limit.json  (expected: water-soluble Cr(VI) of 3.1 mg/kg above the 2 mg/kg limit (REACH Annex XVII, entry 47)) -> as expected
+            - safety.solubleChromiumVI: 3.1 is greater than the maximum of 2
+  REJECTED  invalid/02-unknown-cement-type.json  (expected: cement type not among the 27 products of EN 197-1) -> as expected
+            - composition.cementType: 'CEM II/C-V' is not one of ['CEM I', 'CEM II/A-S', 'CEM II/B-S', 'CEM II/A-D', 'CEM II/A-P', 'CEM II/B-P', 'CEM II/A-Q', 'CEM II/B-Q', 'CEM II/A-V', 'CEM II/B-V', 'CEM II/A-W', 'CEM II/B-W', 'CEM II/A-T', 'CEM II/B-T', 'CEM II/A-L', 'CEM II/B-L', 'CEM II/A-LL', 'CEM II/B-LL', 'CEM II/A-M', 'CEM II/B-M', 'CEM III/A', 'CEM III/B', 'CEM III/C', 'CEM IV/A', 'CEM IV/B', 'CEM V/A', 'CEM V/B']
+  REJECTED  invalid/03-clinker-ratio-outside-en197.json  (expected: clinker ratio of 85 % outside the 65-79 % range of CEM II/B-V (EN 197-1, Table 1)) -> as expected
+            - composition.clinkerRatio: 85.0 is greater than the maximum of 79
+            - composition.clinkerRatio: declared clinkerRatio 85.0 differs from the value derived from the constituents (74.0)
+  REJECTED  invalid/04-invalid-strength-class.json  (expected: strength class not defined in EN 197-1) -> as expected
+            - composition.strengthClass: '50' is not one of ['32.5L', '32.5N', '32.5R', '42.5L', '42.5N', '42.5R', '52.5L', '52.5N', '52.5R']
+  REJECTED  invalid/05-28day-strength-below-class.json  (expected: 28-day strength of 39 MPa below the 42.5 MPa lower limit of class 42.5 (EN 197-1, Table 3)) -> as expected
+            - strength.standardStrength28Days: 39.0 is less than the minimum of 42.5
+  REJECTED  invalid/06-malformed-cas-number.json  (expected: CAS Registry Number not in the NNNNNNN-NN-N format) -> as expected
+            - composition.constituents.0.casNumber: '65997-16' does not match '^\\d{2,7}-\\d{2}-\\d$'
+  REJECTED  invalid/07-latitude-out-of-range.json  (expected: latitude outside -90..90) -> as expected
+            - traceability.quarryLocation.latitude: 95.0 is greater than the maximum of 90
+  REJECTED  invalid/08-undefined-lca-module.json  (expected: module B1 is outside the passport scope (A1-A3, C1-C4)) -> as expected
+            - lcaIndicators.indicatorsPerModule.7.module: 'B1' is not one of ['A1', 'A2', 'A3', 'A1-A3', 'C1', 'C2', 'C3', 'C4']
+  REJECTED  invalid/09-missing-batch-id.json  (expected: mandatory batchID missing) -> as expected
+            - (record root): 'batchID' is a required property
+  REJECTED  invalid/10-unknown-energy-source.json  (expected: energy source outside the controlled vocabulary) -> as expected
+            - energySourceType: 'Nuclear-Fusion' is not one of ['Fossil', 'Alternative', 'Renewable', 'Mixed']
+  REJECTED  invalid/11-passport-uri-not-a-uri.json  (expected: passportURI is not a valid URI and cannot serve as QR content) -> as expected
+            - passportURI: 'passport DCP-EX-2026-000123' is not a 'uri'
+  REJECTED  invalid/12-L-class-with-non-CEM-III.json  (expected: low early strength (L) classes apply only to CEM III cements (EN 197-1)) -> as expected
+            - composition.cementType: 'CEM II/B-V' is not one of ['CEM III/A', 'CEM III/B', 'CEM III/C']
+  REJECTED  invalid/13-cas-check-digit-wrong.json  (expected: CAS Registry Number fails its check digit) -> as expected
+            - composition.constituents.0.casNumber: '65997-16-3' fails the CAS Registry Number check digit
+  REJECTED  invalid/14-duplicate-a3-module.json  (expected: module A3 declared twice) -> as expected
+            - lcaIndicators.indicatorsPerModule: module A3 is declared more than once
+
+[2] The cement passport of the accepted synthetic batch
+  CEMENT PASSPORT (synthetic example)
+  Batch DCP-EX-2026-000123
+  CEM II/B-V 42.5N
+  Clinker 74%  28d 48 MPa
+  Cr(VI) 1.2 mg/kg (max 2)
+  GWP A1-A3 612 kgCO2e/t
+
+[3] QR codes and passport page
+  design QR (passport URI, needs a server):  output/qr_DCP-EX-2026-000123_uri.png
+  demonstration QR (readable on any phone):  output/qr_DCP-EX-2026-000123_summary.png
+  passport page (open in a web browser):     output/passport_DCP-EX-2026-000123.html
+  online copy of the passport page:          https://shayestehhkhh.github.io/Cement-Passport/
+
+[4] Role-dependent views
+  public  : 5 fields -> batchID, passportURI, plantLocation, cementType, GWP-total A1-A3 (kg CO2 eq / 1 t cement)
+  engineer: 10 fields -> batchID, passportURI, plantLocation, cementType, GWP-total A1-A3 (kg CO2 eq / 1 t cement), strengthClass, standardStrength28Days (MPa), manufacturingDate, safetyDataSheet, recyclabilityStatus
+  auditor : 16 fields -> batchID, passportURI, plantLocation, cementType, GWP-total A1-A3 (kg CO2 eq / 1 t cement), strengthClass, standardStrength28Days (MPa), manufacturingDate, safetyDataSheet, recyclabilityStatus, manufacturerID, clinkerRatio, constituents, solubleChromiumVI (mg/kg), energySourceType, indicatorsPerModule
+
+[5] Offline simulation of the MQTT-based A3 update
+  RECORDED  valid message
+  DISCARDED negative energy value
+            - indicators.primaryEnergyNonRenewableTotal: -5.0 is less than the minimum of 0
+  DISCARDED wrong batchID
+            - batchID: message for 'DCP-EX-2026-999999' does not match passport 'DCP-EX-2026-000123'
+
+========================================================================
+RESULT: all checks behaved as expected
+
+YOUR CEMENT PASSPORT (accepted synthetic batch)
++---------------------------------------+
+|  CEMENT PASSPORT (synthetic example)  |
+|  Batch DCP-EX-2026-000123             |
+|  CEM II/B-V 42.5N                     |
+|  Clinker 74%  28d 48 MPa              |
+|  Cr(VI) 1.2 mg/kg (max 2)             |
+|  GWP A1-A3 612 kgCO2e/t               |
++---------------------------------------+
+Open output/passport_DCP-EX-2026-000123.html in a web browser to see the full passport and its QR code.

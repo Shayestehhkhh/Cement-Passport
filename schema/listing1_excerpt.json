@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Digital Cement Passport (DCP) - batch record",
+  "type": "object",
+  "required": ["batchID", "passportURI", "traceability", "composition", "strength", "safety", "lcaIndicators"],
+  "properties": {
+    "batchID": { "type": "string", "minLength": 1 },
+    "passportURI": { "type": "string", "format": "uri" },
+    "composition": {
+      "type": "object",
+      "required": ["cementType", "strengthClass", "clinkerRatio", "constituents"],
+      "properties": {
+        "cementType": { "$ref": "#/definitions/cementTypeEN197_1" },
+        "strengthClass": { "$ref": "#/definitions/strengthClassEN197_1" },
+        "clinkerRatio": { "type": "number", "minimum": 0, "maximum": 100 },
+        "constituents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "role", "casNumber", "massPercent"],
+            "properties": {
+              "casNumber": { "type": "string", "pattern": "^\\d{2,7}-\\d{2}-\\d$" },
+              "massPercent": { "type": "number", "minimum": 0, "maximum": 100 }
+            }
+          }
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "cementType": { "const": "CEM II/B-V" } } },
+          "then": { "properties": { "clinkerRatio": { "minimum": 65, "maximum": 79 } } } }
+      ]
+    },
+    "safety": {
+      "type": "object",
+      "required": ["solubleChromiumVI"],
+      "properties": {
+        "solubleChromiumVI": { "type": "number", "minimum": 0, "maximum": 2 }
+      }
+    },
+    "lcaIndicators": {
+      "type": "object",
+      "required": ["declaredUnit", "indicatorsPerModule"],
+      "properties": {
+        "declaredUnit": { "type": "string", "minLength": 1 },
+        "indicatorsPerModule": { "type": "array", "items": { "$ref": "#/definitions/moduleIndicators" } }
+      }
+    }
+  },
+  "definitions": {
+    "strengthClassEN197_1": {
+      "enum": ["32.5L", "32.5N", "32.5R", "42.5L", "42.5N", "42.5R", "52.5L", "52.5N", "52.5R"]
+    },
+    "moduleIndicators": {
+      "type": "object",
+      "required": ["module", "gwpTotal"],
+      "properties": {
+        "module": { "enum": ["A1", "A2", "A3", "A1-A3", "C1", "C2", "C3", "C4"] },
+        "gwpTotal": { "type": "number" },
+        "primaryEnergyRenewableTotal": { "type": "number", "minimum": 0 },
+        "primaryEnergyNonRenewableTotal": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}

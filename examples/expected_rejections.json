@@ -1,0 +1,58 @@
+{
+  "01-chromium-vi-above-limit.json": {
+    "expectedRejectionReason": "water-soluble Cr(VI) of 3.1 mg/kg above the 2 mg/kg limit (REACH Annex XVII, entry 47)",
+    "expectedErrorLocation": "safety.solubleChromiumVI"
+  },
+  "02-unknown-cement-type.json": {
+    "expectedRejectionReason": "cement type not among the 27 products of EN 197-1",
+    "expectedErrorLocation": "composition.cementType"
+  },
+  "03-clinker-ratio-outside-en197.json": {
+    "expectedRejectionReason": "clinker ratio of 85 % outside the 65-79 % range of CEM II/B-V (EN 197-1, Table 1)",
+    "expectedErrorLocation": "composition.clinkerRatio"
+  },
+  "04-invalid-strength-class.json": {
+    "expectedRejectionReason": "strength class not defined in EN 197-1",
+    "expectedErrorLocation": "composition.strengthClass"
+  },
+  "05-28day-strength-below-class.json": {
+    "expectedRejectionReason": "28-day strength of 39 MPa below the 42.5 MPa lower limit of class 42.5 (EN 197-1, Table 3)",
+    "expectedErrorLocation": "strength.standardStrength28Days"
+  },
+  "06-malformed-cas-number.json": {
+    "expectedRejectionReason": "CAS Registry Number not in the NNNNNNN-NN-N format",
+    "expectedErrorLocation": "composition.constituents.0.casNumber"
+  },
+  "07-latitude-out-of-range.json": {
+    "expectedRejectionReason": "latitude outside -90..90",
+    "expectedErrorLocation": "traceability.quarryLocation.latitude"
+  },
+  "08-undefined-lca-module.json": {
+    "expectedRejectionReason": "module B1 is outside the passport scope (A1-A3, C1-C4)",
+    "expectedErrorLocation": "lcaIndicators.indicatorsPerModule.7.module"
+  },
+  "09-missing-batch-id.json": {
+    "expectedRejectionReason": "mandatory batchID missing",
+    "expectedErrorLocation": "(record root)"
+  },
+  "10-unknown-energy-source.json": {
+    "expectedRejectionReason": "energy source outside the controlled vocabulary",
+    "expectedErrorLocation": "energySourceType"
+  },
+  "11-passport-uri-not-a-uri.json": {
+    "expectedRejectionReason": "passportURI is not a valid URI and cannot serve as QR content",
+    "expectedErrorLocation": "passportURI"
+  },
+  "12-L-class-with-non-CEM-III.json": {
+    "expectedRejectionReason": "low early strength (L) classes apply only to CEM III cements (EN 197-1)",
+    "expectedErrorLocation": "composition.cementType"
+  },
+  "13-cas-check-digit-wrong.json": {
+    "expectedRejectionReason": "CAS Registry Number fails its check digit",
+    "expectedErrorLocation": "composition.constituents.0.casNumber"
+  },
+  "14-duplicate-a3-module.json": {
+    "expectedRejectionReason": "module A3 declared twice",
+    "expectedErrorLocation": "lcaIndicators.indicatorsPerModule"
+  }
+}

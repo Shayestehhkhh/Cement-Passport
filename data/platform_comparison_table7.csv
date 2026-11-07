@@ -1,0 +1,17 @@
+data_category,input_data,battery_pass_eu,gba,circularise,ipoint,core_dpp,applicable_to_construction
+Product ID,Unique Battery ID / QR,full,full,full,full,full (essential),full
+Technical Specs,"Chemistry, Capacity, Voltage",full,full,full,full,full (essential),transferable with cement-specific parameters
+Product Structure,BOM / Material List,partial,partial,full,full,full,full
+Material Composition,"Li, Co, Ni, Mn (by weight)",full,full,full,full,full (essential),full
+Material Origin,Mine & processing location,full,full,full,full,full (essential),full
+Carbon Footprint,CO2 / PCF,full,full,full,full,full (essential),full
+LCA / LCI,"Energy, resources, impacts",partial,partial,full,full,full,full
+Recycled Content,% recycled content,partial,full,full,full,full,full
+ESG / Human Rights,Child / forced labor,full,full,full,full,full (essential),full
+Chemical Compliance,SVHC / banned substances,partial,partial,partial,full,partial (advanced),full
+Performance Data,"SOH, cycles, temp",full,partial,partial,partial,partial (battery-centric),none
+Maintenance,Repair / replacement logs,full,partial,full,partial,partial,partial
+Second Life,Suitability & scenario,partial,partial,partial,full,partial,partial
+Recycling,Recyclability score,full,partial,full,full,full,full
+Dismantling Docs,Disassembly guide,full,partial,full,partial,partial,full
+Legal Liability,Liability transfer,full,none,partial,none,battery specific,none
