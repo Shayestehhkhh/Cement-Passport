@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}</style>
+</head>
+<body>
+<title>Cement Batch Passport</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a cement-bag label on top (product notation + key figures), then role sections stacked as a delivery document */
+:root{
+  --bg:#eef0ef; --paper:#fbfbfa; --ink:#1d2326; --muted:#5d686d; --line:#d3d8d8;
+  --accent:#1f5f7a; --accent-ink:#ffffff; --ok:#2f7d4f; --warnbg:#fff4d6; --warnline:#d9b44a;
+  --c1:#3c4a52; --c2:#8fa3ac; --c3:#d4c39a; --c4:#b0b8bb; --track:#e1e5e5;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --body:"Barlow",Arial,Helvetica,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#14191b; --paper:#1c2326; --ink:#e7ecec; --muted:#9aa7ab; --line:#2f3a3e;
+  --accent:#6fb3cf; --accent-ink:#0d1a20; --ok:#6cc08d; --warnbg:#3a3220; --warnline:#8a7334;
+  --c1:#c9d3d6; --c2:#7f97a1; --c3:#b8a777; --c4:#5f6b70; --track:#2a3337; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#14191b; --paper:#1c2326; --ink:#e7ecec; --muted:#9aa7ab; --line:#2f3a3e;
+  --accent:#6fb3cf; --accent-ink:#0d1a20; --ok:#6cc08d; --warnbg:#3a3220; --warnline:#8a7334;
+  --c1:#c9d3d6; --c2:#7f97a1; --c3:#b8a777; --c4:#5f6b70; --track:#2a3337; color-scheme:dark }
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px;display:grid;gap:22px}
+.note{background:var(--warnbg);border:1px solid var(--warnline);border-radius:6px;padding:10px 14px;font-size:14px}
+.label{background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.label-top{background:var(--accent);color:var(--accent-ink);padding:14px 18px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.label-top .k{font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:15px}
+.label-top .id{font-family:var(--mono);font-size:14px}
+.label-main{padding:18px;display:grid;gap:4px}
+.nw{white-space:nowrap}
+.notation{font-family:var(--display);font-weight:700;font-size:clamp(36px,10vw,68px);line-height:1;letter-spacing:.01em;text-wrap:balance}
+.sub{color:var(--muted);font-size:15px}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));border-top:1px solid var(--line)}
+.fig{padding:14px 18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:grid;gap:2px;min-width:0}
+.fig .t{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.fig .v{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums}
+.fig .v small{font-family:var(--body);font-size:14px;font-weight:500;color:var(--muted);margin-left:4px}
+.chip{display:inline-block;font-size:12px;font-weight:600;color:var(--ok);border:1px solid var(--ok);border-radius:999px;padding:0 8px;width:max-content}
+.chip.flat{color:var(--muted);border-color:var(--line)}
+section{display:grid;gap:12px}
+h2{font-family:var(--display);font-weight:600;font-size:24px;margin:0;display:flex;gap:10px;align-items:center;flex-wrap:wrap;text-wrap:balance}
+.role{font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;border:1px solid var(--accent);color:var(--accent);border-radius:4px;padding:1px 7px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;gap:12px;min-width:0}
+dl{margin:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);}
+dt,dd{margin:0;padding:8px 0;border-bottom:1px solid var(--line);min-width:0;overflow-wrap:anywhere}
+dt{color:var(--muted);font-size:14px;padding-right:12px}
+dl > :nth-last-child(-n+2){border-bottom:0}
+.mono{font-family:var(--mono);font-size:13.5px}
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.compbar{display:flex;height:22px;border-radius:4px;overflow:hidden;gap:2px}
+.seg{display:block;min-width:3px}
+.legend{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.legend li{display:grid;grid-template-columns:14px 1fr auto;gap:10px;align-items:center}
+.sw{width:14px;height:14px;border-radius:3px;display:block}
+.brow{display:grid;grid-template-columns:44px 1fr 52px;gap:10px;align-items:center}
+.track{background:var(--track);height:16px;border-radius:3px;overflow:hidden;display:block}
+.bar{display:block;height:100%;background:var(--accent)}
+.meter{position:relative;height:12px;background:var(--track);border-radius:3px}
+.meter .fill{position:absolute;inset:0 auto 0 0;background:var(--ok);border-radius:3px}
+.meter .lim{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink)}
+.scale{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:460px}
+th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+th.num{text-align:right}
+.cap{font-size:13px;color:var(--muted);margin:0}
+footer{font-size:13px;color:var(--muted);display:grid;gap:6px}
+footer ul{margin:0;padding-left:18px}
+a{color:var(--accent)}
+</style>
+<div class="wrap">
+  <div class="note"><b>Synthetic example.</b> This passport was generated by the Digital Cement Passport pilot. The batch, plant, manufacturer and every value are invented for demonstration. It is not a real cement, a conformity assessment or proof of regulatory compliance.</div>
+
+  <div class="label">
+    <div class="label-top"><span class="k">Digital Cement Passport</span><span class="id">Batch DCP-EX-2026-000123</span></div>
+    <div class="label-main">
+      <div class="notation"><span class="nw">CEM II/B-V</span> <span class="nw">42.5N</span></div>
+      <div class="sub">Common cement to EN 197-1 · Example Cement Plant (fictitious) · manufactured 2026-03-02</div>
+    </div>
+    <div class="figs">
+      <div class="fig"><span class="t">Clinker ratio</span><span class="v">74<small>%</small></span><span class="chip">within 65–79 % for CEM II/B-V</span></div>
+      <div class="fig"><span class="t">28-day strength</span><span class="v">48<small>MPa</small></span><span class="chip">within 42.5–62.5 MPa</span></div>
+      <div class="fig"><span class="t">Soluble Cr(VI)</span><span class="v">1.2<small>mg/kg</small></span><span class="chip">below 2 mg/kg limit</span></div>
+      <div class="fig"><span class="t">GWP-total A1–A3</span><span class="v">612<small>kg CO₂ eq/t</small></span><span class="chip flat">sum of A1, A2, A3</span></div>
+    </div>
+  </div>
+
+  <section>
+    <h2><span class="role">Public</span>Where the carbon comes from</h2>
+    <div class="panel">
+      <p class="cap">GWP-total per EN 15804 module, kg CO₂ eq per 1 t cement. Production stage A1–A3: 612. End-of-life stage C1–C4: 7.5.</p>
+      <div><div class="brow"><span class="bl mono">A1</span><span class="track"><span class="bar" style="width:93.33%"></span></span><span class="bv num">560</span></div><div class="brow"><span class="bl mono">A2</span><span class="track"><span class="bar" style="width:2.00%"></span></span><span class="bv num">12</span></div><div class="brow"><span class="bl mono">A3</span><span class="track"><span class="bar" style="width:6.67%"></span></span><span class="bv num">40</span></div><div class="brow"><span class="bl mono">C1</span><span class="track"><span class="bar" style="width:0.60%"></span></span><span class="bv num">1</span></div><div class="brow"><span class="bl mono">C2</span><span class="track"><span class="bar" style="width:0.60%"></span></span><span class="bv num">3</span></div><div class="brow"><span class="bl mono">C3</span><span class="track"><span class="bar" style="width:0.60%"></span></span><span class="bv num">2</span></div><div class="brow"><span class="bl mono">C4</span><span class="track"><span class="bar" style="width:0.60%"></span></span><span class="bv num">1.5</span></div></div>
+      <div class="brow" aria-hidden="true"><span></span><span class="scale"><span>0</span><span>200</span><span>400</span><span>600</span></span><span></span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="role">Engineer</span>Strength and documents</h2>
+    <div class="panel"><dl>
+      <dt>Strength class (EN 197-1)</dt><dd>42.5N</dd>
+      <dt>Early strength</dt><dd>18 MPa at 2 days (class minimum 10 MPa at 2 days)</dd>
+      <dt>Standard strength, 28 days</dt><dd>48 MPa</dd>
+      <dt>Manufacturing date</dt><dd>2026-03-02</dd>
+      <dt>Safety data sheet</dt><dd class="mono">https://example.org/dcp/docs/sds-example.pdf (placeholder address)</dd>
+      <dt>Recyclability status (stage C)</dt><dd>Not yet assessed</dd>
+    </dl></div>
+  </section>
+
+  <section>
+    <h2><span class="role">Auditor</span>Composition</h2>
+    <div class="panel">
+      <div class="compbar" role="img" aria-label="Composition by mass"><span class="seg" style="flex:70.3;background:var(--c1)" title="Portland cement clinker 70.3 %"></span><span class="seg" style="flex:24.7;background:var(--c2)" title="Siliceous fly ash 24.7 %"></span><span class="seg" style="flex:5.0;background:var(--c3)" title="Gypsum 5 %"></span></div>
+      <ul class="legend"><li><span class="sw" style="background:var(--c1)"></span><span class="ln">Portland cement clinker</span><span class="num">70.3 %</span></li><li><span class="sw" style="background:var(--c2)"></span><span class="ln">Siliceous fly ash</span><span class="num">24.7 %</span></li><li><span class="sw" style="background:var(--c3)"></span><span class="ln">Gypsum</span><span class="num">5 %</span></li></ul>
+      <div class="tablebox"><table>
+        <thead><tr><th>Constituent</th><th>Role</th><th>CAS No.</th><th class="num">% by mass</th></tr></thead>
+        <tbody><tr><td>Portland cement clinker</td><td>clinker</td><td class="mono" style="white-space:nowrap">65997-16-2</td><td class="num">70.3</td></tr><tr><td>Siliceous fly ash</td><td>mainConstituent</td><td class="mono" style="white-space:nowrap">68131-74-8</td><td class="num">24.7</td></tr><tr><td>Gypsum</td><td>calciumSulfate</td><td class="mono" style="white-space:nowrap">13397-24-5</td><td class="num">5</td></tr></tbody></table></div>
+      <p class="cap">Clinker ratio 74 % is clinker as a share of main and minor constituents (calcium sulfate excluded), as defined in EN 197-1.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="role">Auditor</span>Safety, origin and identifiers</h2>
+    <div class="panel">
+      <div style="display:grid;gap:6px">
+        <span class="cap">Water-soluble chromium VI: 1.2 mg/kg; limit 2 mg/kg (REACH Annex XVII, entry 47)</span>
+        <div class="meter" role="img" aria-label="1.2 of 2 mg/kg"><span class="fill" style="width:40.0%"></span><span class="lim" style="left:66.7%"></span></div>
+        <div class="scale"><span>0</span><span>1</span><span>2 (limit)</span><span>3 mg/kg</span></div>
+      </div>
+      <dl>
+        <dt>Manufacturer ID</dt><dd class="mono">MFR-EXAMPLE-0001</dd>
+        <dt>Product SKU</dt><dd class="mono">SKU-EX-CEMIIBV-42.5N</dd>
+        <dt>Quarry location</dt><dd>0, 0 (placeholder)</dd>
+        <dt>Energy source</dt><dd>Mixed</dd>
+        <dt>Passport identifier</dt><dd class="mono">DCP-EX-2026-000123</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="role">Auditor</span>EN 15804 indicators per module</h2>
+    <div class="panel">
+      <div class="tablebox"><table>
+        <thead><tr><th>Module</th><th class="num">GWP-total<br>kg CO₂ eq</th><th class="num">PERT<br>MJ</th><th class="num">PENRT<br>MJ</th><th>Data source</th></tr></thead>
+        <tbody><tr><td class="mono">A1</td><td class="num">560</td><td class="num">120</td><td class="num">2100</td><td>EPD</td></tr><tr><td class="mono">A2</td><td class="num">12</td><td class="num">2</td><td class="num">160</td><td>supplyChainReport</td></tr><tr><td class="mono">A3</td><td class="num">40</td><td class="num">30</td><td class="num">450</td><td>IoT/MQTT</td></tr><tr><td class="mono">C1</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td>EPD</td></tr><tr><td class="mono">C2</td><td class="num">3</td><td class="num">–</td><td class="num">–</td><td>EPD</td></tr><tr><td class="mono">C3</td><td class="num">2</td><td class="num">–</td><td class="num">–</td><td>EPD</td></tr><tr><td class="mono">C4</td><td class="num">1.5</td><td class="num">–</td><td class="num">–</td><td>EPD</td></tr></tbody></table></div>
+      <p class="cap">Per 1 t cement. Module A3 is the value designed to be updated through the proposed MQTT component (last update 2026-03-02T18:00:00Z).</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>In a deployed system each role would see only its own section. All sections are shown here for demonstration.</span>
+    <span>Rules applied by the pilot schema:</span>
+    <ul>
+      <li>EN 197-1:2011 – cement type, clinker range (Table 1), strength class and limits (Table 3)</li>
+      <li>REACH, Regulation (EC) No 1907/2006, Annex XVII, entry 47 – water-soluble chromium VI</li>
+      <li>EN 15804:2012+A2:2019 – information modules and indicators GWP-total, PERT, PENRT</li>
+    </ul>
+    <span>Data: examples/batch-valid.json of the DCP illustrative pilot, version 1.0.0 (Hamidkhaniha, Universidad de Sevilla).</span>
+  </footer>
+</div>
+
+</body>
+</html>
