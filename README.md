@@ -1,8 +1,7 @@
 # Digital Cement Passport (DCP) – illustrative pilot implementation
 
 This repository accompanies a manuscript on the Digital Cement Passport (DCP) framework by
-Hamidkhaniha, Garcia Martinez and Pourhosseini (Universidad de Sevilla), currently under review.
-The reference to the published article will be added here after publication.
+Hamidkhaniha, Garcia Martinez and Pourhosseini (Universidad de Sevilla).
 
 The manuscript is **conceptual**: it specifies the DCP framework. This package is a **small pilot** that
 shows the specified data structure can be expressed in machine-readable form and checked automatically.
@@ -121,7 +120,7 @@ and the "carbon footprint per lifecycle stage" list pattern, which is reused her
 modules. The cement model was written anew; no files or text were copied from that repository.
 See `NOTICE.md`.
 
-Generative AI tools (Google Gemini and Anthropic Claude) assisted in drafting and restructuring the code.
+Generative AI (Anthropic Claude) assisted in drafting, restructuring and testing the code.
 The author reviewed and tested all files and takes responsibility for them.
 
 ## Status
@@ -131,8 +130,7 @@ corrections are welcome: Shayesteh Hamidkhaniha, Shaham@alum.us.es.
 
 ## How to cite
 
-See `CITATION.cff` (repository identifier to be added after deposit in idUS, the institutional
-repository of the Universidad de Sevilla). Please cite this package together with the accompanying publication.
+See `CITATION.cff`. This release is archived on Zenodo, where its DOI is given. Please cite this package together with the accompanying publication.
 
 ## License
 
